@@ -1,0 +1,47 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd client
+
+echo
+echo '🏗️👷 Styling, testing, and building the project before committing 🏗️👷'
+echo
+
+# Check ESLint Standards
+npm run check-lint ||
+(
+  echo
+  echo '❌ ESLint check failed. Make the required changes listed above, add changes and try to commit again ❌'
+  echo
+  false; 
+)
+
+# Check tsconfig standards
+npm run check-types ||
+(
+  echo
+  echo '❌ Typescript types-check failed. Make the required changes listed above, add changes and try to commit again ❌'
+  echo
+  false;
+)
+
+# If everything passes... Now we can try to build the project
+echo
+echo '✅ All the checks are successfully passed. Building project proceeds next ✅'
+echo
+
+
+npm run build ||
+(
+  echo
+  echo '❌ React build failed: view the above errors ❌'
+  echo
+  false;
+)
+
+# If everything passes... Now we can commit
+echo
+echo '✅✅✅ The project has been successfully built and commit is accepted. ✅✅✅'
+echo
+
+npx lint-staged

@@ -1,0 +1,39 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: "Milka Free W05 Regular";
+  src: url("/fonts/7793479/0ec3ebae-55ff-4c39-9daa-35e43ff5c0ce.woff2")
+      format("woff2"),
+    url("/fonts/7793479/6439ca3d-0c68-41b0-820e-e74475c9c671.woff")
+      format("woff");
+  font-style: normal;
+  font-weight: 400;
+}
+
+.customFont {
+  font-family: "Milka Free W05 Regular";
+}
+
+.slick-dots li button:before {
+  font-size: 10px !important;
+}
+
+.slick-dots li.slick-active button:before {
+  opacity: 0.75;
+  color: #fff;
+}
