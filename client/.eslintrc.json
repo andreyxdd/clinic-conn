@@ -52,6 +52,7 @@
       }
     ]
   },
+  "ignorePatterns": ["generated/graphql.ts"],
   "settings": {
     "react": {
       "version": "detect"

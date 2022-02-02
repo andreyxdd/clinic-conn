@@ -1,10 +1,10 @@
 import { Field, ObjectType, Int } from 'type-graphql';
 import {
-  Entity, PrimaryGeneratedColumn, Column, BaseEntity,
+  Entity, PrimaryGeneratedColumn, Column, BaseEntity, UpdateDateColumn, CreateDateColumn,
 } from 'typeorm';
 
 @ObjectType()
-@Entity()
+@Entity({ name: 'user' })
 class User extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
@@ -12,7 +12,7 @@ class User extends BaseEntity {
 
   @Field()
   @Column()
-    name: string;
+    username: string;
 
   @Field()
   @Column()
@@ -21,7 +21,35 @@ class User extends BaseEntity {
   @Column()
     password: string;
 
-  @Column('int', { default: 0 })
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+    first_name?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+    last_name?: string;
+
+  @Field({ nullable: true })
+  @Column({ type: 'date', nullable: true })
+    birthday?: string;
+
+  @Field()
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
+    created_at: Date;
+
+  @Field({ nullable: true })
+  @CreateDateColumn({ type: 'timestamp', nullable: true })
+    verified_at: Date;
+
+  @Field()
+  @Column({ default: false })
+    is_verified: boolean;
+
+  @Field()
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
+    updated_at: Date;
+
+  @Column({ type: 'int', default: 0 })
     tokenVersion: number;
 }
 

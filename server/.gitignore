@@ -4,3 +4,5 @@ node_modules/
 build/
 tmp/
 temp/
+
+db/heroku-connection-string.txt

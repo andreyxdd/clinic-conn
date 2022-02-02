@@ -1,10 +1,16 @@
 {
    "type": "postgres",
-   "host": "localhost",
+   "host": "ec2-54-235-98-1.compute-1.amazonaws.com",
    "port": 5432,
-   "username": "postgres",
-   "password": "Zheccrbq1221",
-   "database": "nodelogin",
+   "username": "jrypwppneyonfm",
+   "password": "1b3bbca0a3d86558581dcf7221ab471ed3155fb4a143542bbae5c3015112862c",
+   "database": "dau2opfilkovbf",
+   "ssl": true,
+   "extra": {
+      "ssl": {
+         "rejectUnauthorized": false
+      }
+   },
    "synchronize": true,
    "logging": false,
    "entities": [

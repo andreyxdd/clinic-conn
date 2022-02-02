@@ -3,35 +3,25 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { Typography, Button } from '@mui/material';
 
-export async function getStaticProps() {
-  return {
-    props: {}, // will be passed to the page component as props
-  };
-}
-
 /**
  * This is the landing page.
  * @return {JSX.Element}
  */
-// eslint-disable-next-line no-unused-vars
-const Landing: NextPage = (props): JSX.Element => {
+const Home: NextPage = (): JSX.Element => {
   const router = useRouter();
   const handleClick = () => {
-    router.push('/home');
+    router.push('/register');
   };
   return (
     <div>
       <Typography variant='h4'>
-        This is a landing page
-      </Typography>
-      <Typography variant='body1'>
-        This page helps better understand out business model.
+        This is a home page
       </Typography>
       <Button onClick={handleClick} variant='outlined' type='button'>
-        Procced to home page
+        Procced to register page
       </Button>
     </div>
   );
 };
 
-export default Landing;
+export default Home;

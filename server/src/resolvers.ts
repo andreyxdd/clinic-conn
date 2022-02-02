@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable class-methods-use-this */
 import {
   Query, Resolver, Mutation, Arg, Ctx, UseMiddleware,
@@ -8,7 +9,8 @@ import {
   createAccessToken, sendRefreshToken, isAuth, revokeRefreshTokensForUser, createRefreshToken,
 } from './auth';
 import User from './entity/User';
-import LoginResponse from './entity/LoginResponse';
+import RegisterResponse from './response/RegisterResponse';
+import LoginResponse from './response/LoginResponse';
 import { AuthContext } from './types';
 
 @Resolver()
@@ -53,24 +55,52 @@ class UserResolver {
     }
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => RegisterResponse)
   async register(
-    @Arg('name') name: string,
+    @Arg('username') username: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
+    @Arg('first_name', { nullable: true }) first_name?: string,
+    @Arg('last_name', { nullable: true }) last_name?: string,
+    @Arg('birthday', { nullable: true }) birthday?: string,
   ) {
     try {
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail) {
+        return {
+          ok: false,
+          error: 'Account with the same email already exists',
+          field: 'email',
+        };
+      }
+
+      const existingUsername = await User.findOne({ where: { username } });
+      if (existingUsername) {
+        return {
+          ok: false,
+          error: 'Account with the same username already exists',
+          field: 'username',
+        };
+      }
+
       const hashedPassword = await hash(password, 12);
       await User.insert({
-        name,
+        username,
         email,
         password: hashedPassword,
+        first_name,
+        last_name,
+        birthday,
       });
     } catch (err) {
       console.log(err);
-      return false;
+      return {
+        ok: false, error: 'Something went wrong',
+      };
     }
-    return true;
+    return {
+      ok: true,
+    };
   }
 
   @Mutation(() => LoginResponse)
