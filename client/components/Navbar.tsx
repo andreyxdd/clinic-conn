@@ -77,6 +77,7 @@ const Navbar: React.FC<INavbarProps> = (
               {
                 navigationPaths.map((item: IPathProps) => (
                   <Button
+                    key={item.title}
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     variant={router.pathname === item.path ? 'outlined' : 'inherit'}

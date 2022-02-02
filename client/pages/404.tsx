@@ -10,6 +10,7 @@ const Notfound = () => {
     setTimeout(() => {
       router.push('/home');
     }, 6000);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // purple x moss 2020

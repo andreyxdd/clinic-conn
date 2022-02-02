@@ -4,7 +4,7 @@
     "es2021": true,
     "node": true
   },
-  "extends": ["plugin:react/recommended", "airbnb"],
+  "extends": ["plugin:react/recommended", "airbnb", "next"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -50,7 +50,8 @@
         "namedComponents": "arrow-function",
         "unnamedComponents": "arrow-function"
       }
-    ]
+    ],
+    "@next/next/no-html-link-for-pages": ["error", "./pages"]
   },
   "ignorePatterns": ["generated/graphql.ts"],
   "settings": {

@@ -39,10 +39,6 @@ export default class MyDocument extends Document {
             href='https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;900&display=swap'
             rel='stylesheet'
           />
-          <script
-            src='https://kit.fontawesome.com/4b9ba14b0f.js'
-            crossOrigin='anonymous'
-          />
           <link
             rel='stylesheet'
             type='text/css'
@@ -99,6 +95,7 @@ MyDocument.getInitialProps = async (ctx) => {
   ctx.renderPage = () => originalRenderPage({
     // eslint-disable-next-line react/display-name
     // eslint-disable-next-line func-names
+    // eslint-disable-next-line react/display-name
     enhanceApp: (App: any) => (props) =>
       // eslint-disable-next-line react/jsx-props-no-spreading
       <App emotionCache={cache} {...props} />,
