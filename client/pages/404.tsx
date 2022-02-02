@@ -8,7 +8,7 @@ const Notfound = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      router.push('/');
+      router.push('/home');
     }, 6000);
   }, []);
 
@@ -43,12 +43,11 @@ const Notfound = () => {
               В любом случае, я перенаправляю тебя на нашу домашнюю страницу
             </p>
             <p
-              className='customFont'
               style={{
                 fontSize: '1.6rem',
               }}
             >
-              <Link href='/'>BIOPOLYRKA</Link>
+              <Link href='/home'>WorldMedExpo</Link>
             </p>
           </div>
         </Grid>
@@ -56,9 +55,9 @@ const Notfound = () => {
       <style jsx>
         {`
           .wrapper {
-            height: 100vh;
-            width: 100vw;
-            background-color: #ff9e01;
+            min-height: 100vh;
+            width: 100%;
+            background-color: #42a5f5;
             display: -ms-flexbox;
             display: -webkit-flex;
             display: flex;
@@ -66,17 +65,18 @@ const Notfound = () => {
             -webkit-align-items: center;
             -webkit-box-align: center;
             align-items: center;
+            padding-top: 0
           }
 
           .err {
             color: #ffffff;
             font-family: "Nunito Sans", sans-serif;
-            font-size: 25vw;
-            padding: 0px 20px 0px 20px;
+            font-size: 17vh;
+            padding: 0px 10px 0px 10px;
           }
 
           .far {
-            font-size: 22vw;
+            font-size: 14vh;
             color: #ffffff;
           }
 

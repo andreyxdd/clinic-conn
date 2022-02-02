@@ -5,6 +5,14 @@ import Layout from '../layouts/Layout';
 interface ILoginProps {
 }
 
-const Login: React.FC<ILoginProps> = () => <Layout><div>login page</div></Layout>;
+const Login: React.FC<ILoginProps> = () => (
+  <Layout
+    showNavbar={false}
+    showTransition={false}
+    maxWidth='xs'
+  >
+    <div>login page</div>
+  </Layout>
+);
 
 export default Login;

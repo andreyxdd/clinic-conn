@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { IAppContextProps } from '../types';
+import { IAppContextProps } from '../config/types';
 
 export const AppContext = createContext<IAppContextProps | null>(null);
 

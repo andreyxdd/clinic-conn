@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContextProvider';
-import { IAppContextProps } from '../types';
+import { IAppContextProps } from '../config/types';
 
 // hook to resolve types
 // eslint-disable-next-line import/prefer-default-export
