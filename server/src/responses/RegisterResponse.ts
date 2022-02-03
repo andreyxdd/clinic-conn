@@ -7,9 +7,6 @@ class RegisterResponse {
 
   @Field({ nullable: true })
     error?: string;
-
-  @Field({ nullable: true })
-    field?: string;
 }
 
 export default RegisterResponse;

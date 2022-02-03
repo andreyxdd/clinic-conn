@@ -23,6 +23,16 @@ const client = createClient({
   fetchOptions: {
     credentials: 'include',
   },
+  fetch: (...args) => fetch(...args).then((response) => {
+    const myHeader = response.headers.get('my-header');
+    if (myHeader) {
+      console.log('%c_app.tsx line:29 myHeader', 'color: #007acc;', myHeader);
+    }
+
+    console.log(response);
+
+    return response;
+  }),
 });
 
 const App = (props: IAppProps) => {

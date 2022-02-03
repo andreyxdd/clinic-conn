@@ -8,6 +8,7 @@ import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ValidationIcon from './ValidationIcon';
+import { IValidatorProps } from '../utils/validateInput';
 
 export interface IInputProps {
   id: string;
@@ -19,10 +20,11 @@ export interface IInputProps {
   autoComplete: string;
   halfWidth: boolean;
   valueToConfirm?: string;
+  checkInDB?: boolean;
   // eslint-disable-next-line no-unused-vars
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   // eslint-disable-next-line no-unused-vars
-  validator: (value: string, valueToConfirm?: string) => Promise<string>;
+  validator?: ({ value, valueToConfirm, checkInDB }:IValidatorProps) => Promise<string>;
   setDisabledSubmit?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -42,6 +44,7 @@ const Input: React.FC<IInputProps> = ({
   autoComplete,
   halfWidth,
   valueToConfirm,
+  checkInDB,
   handleChange,
   validator,
   setDisabledSubmit,
@@ -55,14 +58,10 @@ const Input: React.FC<IInputProps> = ({
   };
 
   const handleBlur = async () => {
-    if (value !== '') {
-      let validationResult;
-
-      if (id === 'confirmPassword') {
-        validationResult = await validator(value, valueToConfirm);
-      } else {
-        validationResult = await validator(value);
-      }
+    if (value !== '' && validator) {
+      const validationResult = await validator(
+        { value, valueToConfirm, checkInDB },
+      );
 
       setError(validationResult);
       setShowValidationIcon(true);

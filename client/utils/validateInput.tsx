@@ -19,6 +19,12 @@ interface ICheckFieldProps{
   error: string;
 }
 
+export interface IValidatorProps{
+  value: string;
+  valueToConfirm?: string;
+  checkInDB?: boolean;
+}
+
 // method to check if the same email existed in db
 async function checkEmail(emailToCheck: string): Promise<ICheckFieldProps> {
   const data = JSON.stringify({
@@ -55,7 +61,7 @@ async function checkEmail(emailToCheck: string): Promise<ICheckFieldProps> {
     console.log('%cvalidateInput.tsx line:50 e', 'color: #007acc;', e);
   }
 
-  return { ok: false, error: 'Internal error' };
+  return { ok: false, error: 'Internal Client Error' };
 }
 
 // method to check if the same username existed in db
@@ -94,25 +100,30 @@ async function checkUsername(usernameToCheck: string): Promise<ICheckFieldProps>
     console.log('%cvalidateInput.tsx line:93 e', 'color: #007acc;', e);
   }
 
-  return { ok: false, error: 'Internal error' };
+  return { ok: false, error: 'Internal Client Error' };
 }
 
-export async function validateEmail(value: string): Promise<string> {
-  const { ok, error } = await checkEmail(value);
-
+export async function validateEmail(
+  { value, checkInDB }: IValidatorProps,
+): Promise<string> {
   if (!validEmail.test(
     value,
   )) {
     return 'Incorrect email provided';
-  } if (!ok) {
-    return error;
   }
+  if (checkInDB) {
+    const { ok, error } = await checkEmail(value);
+    if (!ok) {
+      return error;
+    }
+  }
+
   return '';
 }
 
-export async function validateUsername(value: string): Promise<string> {
-  const { ok, error } = await checkUsername(value);
-
+export async function validateUsername(
+  { value, checkInDB }: IValidatorProps,
+): Promise<string> {
   if (!minUsernameLength.test(value)) {
     return 'Username should be at least 5 charachters long';
   } if (!spaces.test(value)) {
@@ -121,13 +132,18 @@ export async function validateUsername(value: string): Promise<string> {
     return 'Special charachters are not allowed in username';
   } if (maxInputLength.test(value)) {
     return 'Username can\'t be that long';
-  } if (!ok) {
-    return error;
+  } if (checkInDB) {
+    const { ok, error } = await checkUsername(value);
+    if (!ok) {
+      return error;
+    }
   }
   return '';
 }
 
-export async function validatePassword(value: string): Promise<string> {
+export async function validatePassword(
+  { value }: IValidatorProps,
+): Promise<string> {
   if (!validPassword.test(value)) {
     return 'Password should be at least eight characters long, have one letter and one number';
   } if (maxInputLength.test(value)) {
@@ -136,14 +152,18 @@ export async function validatePassword(value: string): Promise<string> {
   return '';
 }
 
-export async function validateConfirmPassword(value: string, valueToConfirm?: string): Promise<string> {
+export async function validateConfirmPassword(
+  { value, valueToConfirm }: IValidatorProps,
+): Promise<string> {
   if (value !== valueToConfirm) {
     return 'Passwords do not match';
   }
   return '';
 }
 
-export async function validateName(value: string): Promise<string> {
+export async function validateName(
+  { value }: IValidatorProps,
+): Promise<string> {
   if (specialCharachters.test(value)) {
     return 'Special characters are not allowed';
   } if (maxInputLength.test(value)) {

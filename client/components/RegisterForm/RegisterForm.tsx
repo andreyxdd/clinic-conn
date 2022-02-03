@@ -14,9 +14,15 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import TextField from '@mui/material/TextField';
+import { format } from 'date-fns';
+import { useRouter } from 'next/router';
 
+// custom
 import Input, { IInputProps } from '../Input';
 import { requiredFields, additionalFields } from './formFields';
+
+// server
+import { useRegisterMutMutation } from '../../generated/graphql';
 
 const RegisterForm = () => {
   // -- required fields
@@ -30,6 +36,12 @@ const RegisterForm = () => {
     newForm[index].value = event.target.value;
     setRequiredForm(newForm);
   };
+
+  const findRequiredFieldValue = (idToFind: string) => (
+    requiredForm[
+      requiredForm.findIndex(({ id }) => id === idToFind)
+    ].value
+  );
   // --
 
   // -- additional fields
@@ -45,11 +57,32 @@ const RegisterForm = () => {
     newForm[index].value = event.target.value;
     setAdditionalForm(newForm);
   };
+  const findAdditionalFieldValue = (idToFind: string) => {
+    const val = additionalForm[
+      additionalForm.findIndex(({ id }) => id === idToFind)
+    ]?.value;
+
+    console.log('%cRegisterForm.tsx line:67 idToFind', 'color: #007acc;', idToFind);
+    console.log('%cRegisterForm.tsx line:67 additionalForm', 'color: #007acc;', additionalForm[0]?.value);
+
+    return val || null;
+  };
   //--
 
-  // -- submit button state
+  // -- form submit state
   const [disabledSubmit, setDisabledSubmit] = React.useState(true);
   const [showFormHelper, setShowFormHelper] = React.useState(false);
+  const [helper, setHelper] = React.useState('');
+  const [, register] = useRegisterMutMutation();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (disabledSubmit) {
+      setHelper(
+        'Please filled out required fields or correct errors indicated above',
+      );
+    }
+  }, [disabledSubmit]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,7 +92,29 @@ const RegisterForm = () => {
     } else {
       setShowFormHelper(false);
 
-      console.log(additionalForm);
+      console.log('submitted!');
+
+      const res = await register({
+        email:
+          findRequiredFieldValue('email'),
+        username:
+          findRequiredFieldValue('username'),
+        password:
+          findRequiredFieldValue('password'),
+        first_name:
+          findAdditionalFieldValue('firstName'),
+        last_name:
+          findAdditionalFieldValue('lastName'),
+        birthday:
+          birthdayField !== null ? format(birthdayField, 'yyyy-MM-dd') : null,
+      });
+
+      if (res.data?.register.ok) {
+        router.push('/home');
+      } else {
+        setShowFormHelper(true);
+        setHelper(res.data?.register.error || 'Internal error');
+      }
     }
   };
   // --
@@ -97,9 +152,7 @@ const RegisterForm = () => {
               halfWidth={field.halfWidth}
               validator={field.validator}
               valueToConfirm={
-                requiredForm[
-                  requiredForm.findIndex(({ id }) => id === 'password')
-                ].value
+                findRequiredFieldValue('password')
               }
               setDisabledSubmit={setDisabledSubmit}
               key={field.label}
@@ -163,7 +216,7 @@ const RegisterForm = () => {
             <Grid container justifyContent='center'>
               <Grid item>
                 <FormHelperText error id='form-helper-text'>
-                  Please filled out required fields or correct errors indicated above
+                  {helper}
                 </FormHelperText>
               </Grid>
             </Grid>
@@ -180,7 +233,7 @@ const RegisterForm = () => {
         <Grid container justifyContent='flex-end'>
           <Grid item>
             <Link href='/login' variant='body2'>
-              Already have an account? Sign in
+              Already have an account? Login
             </Link>
           </Grid>
         </Grid>

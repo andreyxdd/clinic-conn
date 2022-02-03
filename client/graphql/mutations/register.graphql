@@ -16,6 +16,5 @@ mutation RegisterMut(
   ){
     ok
     error
-    field
   }
 }

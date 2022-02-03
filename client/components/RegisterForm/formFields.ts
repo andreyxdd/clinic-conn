@@ -17,6 +17,7 @@ export const requiredFields: Array<IInputProps> = [
     value: '',
     autoComplete: 'email',
     halfWidth: false,
+    checkInDB: true,
     validator: validateEmail,
   },
   {
@@ -28,6 +29,7 @@ export const requiredFields: Array<IInputProps> = [
     value: '',
     autoComplete: 'username',
     halfWidth: false,
+    checkInDB: true,
     validator: validateUsername,
   },
   {

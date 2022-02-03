@@ -91,24 +91,6 @@ class UserResolver {
     @Arg('birthday', { nullable: true }) birthday?: string,
   ) {
     try {
-      const existingEmail = await User.findOne({ where: { email } });
-      if (existingEmail) {
-        return {
-          ok: false,
-          error: 'Account with the same email already exists',
-          field: 'email',
-        };
-      }
-
-      const existingUsername = await User.findOne({ where: { username } });
-      if (existingUsername) {
-        return {
-          ok: false,
-          error: 'Account with the same username already exists',
-          field: 'username',
-        };
-      }
-
       const hashedPassword = await hash(password, 12);
       await User.insert({
         username,
@@ -121,7 +103,7 @@ class UserResolver {
     } catch (err) {
       console.log(err);
       return {
-        ok: false, error: 'Something went wrong',
+        ok: false, error: 'Internal Server Error',
       };
     }
     return {

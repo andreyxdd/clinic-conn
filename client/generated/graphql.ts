@@ -75,7 +75,6 @@ export type QueryUsernameCheckArgs = {
 export type RegisterResponse = {
   __typename?: 'RegisterResponse';
   error?: Maybe<Scalars['String']>;
-  field?: Maybe<Scalars['String']>;
   ok: Scalars['Boolean'];
 };
 
@@ -93,6 +92,14 @@ export type User = {
   verified_at?: Maybe<Scalars['DateTime']>;
 };
 
+export type LoginMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', accessToken: string } };
+
 export type RegisterMutMutationVariables = Exact<{
   password: Scalars['String'];
   email: Scalars['String'];
@@ -103,23 +110,34 @@ export type RegisterMutMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutMutation = { __typename?: 'Mutation', register: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null, field?: string | null } };
+export type RegisterMutMutation = { __typename?: 'Mutation', register: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null } };
 
 export type EmailCheckQueryVariables = Exact<{
   email: Scalars['String'];
 }>;
 
 
-export type EmailCheckQuery = { __typename?: 'Query', emailCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null, field?: string | null } };
+export type EmailCheckQuery = { __typename?: 'Query', emailCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null } };
 
 export type UsernameCheckQueryVariables = Exact<{
   username: Scalars['String'];
 }>;
 
 
-export type UsernameCheckQuery = { __typename?: 'Query', usernameCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null, field?: string | null } };
+export type UsernameCheckQuery = { __typename?: 'Query', usernameCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null } };
 
 
+export const LoginDocument = gql`
+    mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    accessToken
+  }
+}
+    `;
+
+export function useLoginMutation() {
+  return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
 export const RegisterMutDocument = gql`
     mutation RegisterMut($password: String!, $email: String!, $username: String!, $first_name: String, $last_name: String, $birthday: String) {
   register(
@@ -132,7 +150,6 @@ export const RegisterMutDocument = gql`
   ) {
     ok
     error
-    field
   }
 }
     `;
@@ -145,7 +162,6 @@ export const EmailCheckDocument = gql`
   emailCheck(email: $email) {
     ok
     error
-    field
   }
 }
     `;
@@ -158,7 +174,6 @@ export const UsernameCheckDocument = gql`
   usernameCheck(username: $username) {
     ok
     error
-    field
   }
 }
     `;

@@ -104,7 +104,7 @@ const Navbar: React.FC<INavbarProps> = (
                 </AuthButton>
               ) : (
                 <AuthButton
-                  onClick={() => {}}
+                  onClick={() => { handleNavigationClick('/login'); }}
                   type='button'
                   variant='contained'
                 >
