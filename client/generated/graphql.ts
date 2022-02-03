@@ -1,6 +1,5 @@
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -32,10 +31,12 @@ export type Mutation = {
   revokeRefreshToken: Scalars['Boolean'];
 };
 
+
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
+
 
 export type MutationRegisterArgs = {
   birthday?: InputMaybe<Scalars['String']>;
@@ -46,6 +47,7 @@ export type MutationRegisterArgs = {
   username: Scalars['String'];
 };
 
+
 export type MutationRevokeRefreshTokenArgs = {
   email: Scalars['String'];
 };
@@ -53,9 +55,21 @@ export type MutationRevokeRefreshTokenArgs = {
 export type Query = {
   __typename?: 'Query';
   bye: Scalars['String'];
+  emailCheck: RegisterResponse;
   hello: Scalars['String'];
   user?: Maybe<User>;
+  usernameCheck: RegisterResponse;
   users: Array<User>;
+};
+
+
+export type QueryEmailCheckArgs = {
+  email: Scalars['String'];
+};
+
+
+export type QueryUsernameCheckArgs = {
+  username: Scalars['String'];
 };
 
 export type RegisterResponse = {
@@ -88,7 +102,23 @@ export type RegisterMutMutationVariables = Exact<{
   birthday?: InputMaybe<Scalars['String']>;
 }>;
 
+
 export type RegisterMutMutation = { __typename?: 'Mutation', register: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null, field?: string | null } };
+
+export type EmailCheckQueryVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type EmailCheckQuery = { __typename?: 'Query', emailCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null, field?: string | null } };
+
+export type UsernameCheckQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type UsernameCheckQuery = { __typename?: 'Query', usernameCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null, field?: string | null } };
+
 
 export const RegisterMutDocument = gql`
     mutation RegisterMut($password: String!, $email: String!, $username: String!, $first_name: String, $last_name: String, $birthday: String) {
@@ -109,4 +139,30 @@ export const RegisterMutDocument = gql`
 
 export function useRegisterMutMutation() {
   return Urql.useMutation<RegisterMutMutation, RegisterMutMutationVariables>(RegisterMutDocument);
+};
+export const EmailCheckDocument = gql`
+    query EmailCheck($email: String!) {
+  emailCheck(email: $email) {
+    ok
+    error
+    field
+  }
 }
+    `;
+
+export function useEmailCheckQuery(options: Omit<Urql.UseQueryArgs<EmailCheckQueryVariables>, 'query'>) {
+  return Urql.useQuery<EmailCheckQuery>({ query: EmailCheckDocument, ...options });
+};
+export const UsernameCheckDocument = gql`
+    query UsernameCheck($username: String!) {
+  usernameCheck(username: $username) {
+    ok
+    error
+    field
+  }
+}
+    `;
+
+export function useUsernameCheckQuery(options: Omit<Urql.UseQueryArgs<UsernameCheckQueryVariables>, 'query'>) {
+  return Urql.useQuery<UsernameCheckQuery>({ query: UsernameCheckDocument, ...options });
+};

@@ -1,0 +1,80 @@
+import {
+  validateEmail,
+  validateUsername,
+  validatePassword,
+  validateConfirmPassword,
+  validateName,
+} from '../../utils/validateInput';
+import { IInputProps } from '../Input';
+
+export const requiredFields: Array<IInputProps> = [
+  {
+    id: 'email',
+    required: true,
+    label: 'Email Address',
+    name: 'email',
+    type: 'email',
+    value: '',
+    autoComplete: 'email',
+    halfWidth: false,
+    validator: validateEmail,
+  },
+  {
+    id: 'username',
+    required: true,
+    label: 'Username',
+    name: 'username',
+    type: 'username',
+    value: '',
+    autoComplete: 'username',
+    halfWidth: false,
+    validator: validateUsername,
+  },
+  {
+    id: 'password',
+    required: true,
+    label: 'Password',
+    name: 'password',
+    type: 'password',
+    value: '',
+    autoComplete: 'password',
+    halfWidth: false,
+    validator: validatePassword,
+  },
+  {
+    id: 'confirmPassword',
+    required: true,
+    label: 'Confirm Password',
+    name: 'confirmPassword',
+    type: 'password',
+    value: '',
+    autoComplete: 'password',
+    halfWidth: false,
+    validator: validateConfirmPassword,
+  },
+];
+
+export const additionalFields = [
+  {
+    id: 'firstName',
+    required: false,
+    label: 'First Name',
+    name: 'firstName',
+    type: 'text',
+    value: '',
+    autoComplete: 'given-name',
+    halfWidth: true,
+    validator: validateName,
+  },
+  {
+    id: 'lasttName',
+    required: false,
+    label: 'Last Name',
+    name: 'lastName',
+    type: 'text',
+    value: '',
+    autoComplete: 'family-name',
+    halfWidth: true,
+    validator: validateName,
+  },
+];

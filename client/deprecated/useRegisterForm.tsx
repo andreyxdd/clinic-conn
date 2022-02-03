@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import validate, { IformFieldsProps, IformProps } from './validate';
-import { useRegisterMutMutation } from '../../generated/graphql';
+import { useRegisterMutMutation } from '../generated/graphql';
 
 const formFields = {
   email: '',

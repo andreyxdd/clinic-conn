@@ -34,7 +34,7 @@ const Patients: NextPage = (): JSX.Element => {
         Choose wisely:
       </Typography>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Grid container justifyContent='space-evenly' xs={6} spacing={3}>
+        <Grid container justifyContent='space-evenly' spacing={3}>
           <Grid item xs={6} container justifyContent='center'>
             <Button
               onClick={() => { handleClick('/register'); }}

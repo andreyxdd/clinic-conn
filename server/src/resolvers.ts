@@ -9,8 +9,8 @@ import {
   createAccessToken, sendRefreshToken, isAuth, revokeRefreshTokensForUser, createRefreshToken,
 } from './auth';
 import User from './entity/User';
-import RegisterResponse from './response/RegisterResponse';
-import LoginResponse from './response/LoginResponse';
+import RegisterResponse from './responses/RegisterResponse';
+import LoginResponse from './responses/LoginResponse';
 import { AuthContext } from './types';
 
 @Resolver()
@@ -30,6 +30,32 @@ class UserResolver {
   @UseMiddleware(isAuth)
   bye(@Ctx() { payload }: AuthContext) {
     return `your user id is ${payload!.userId}`;
+  }
+
+  @Query(() => RegisterResponse)
+  async emailCheck(@Arg('email') email: string) {
+    const existingEmail = await User.findOne({ where: { email } });
+    if (existingEmail) {
+      return {
+        ok: false,
+        error: 'Account with the same email already exists',
+        field: 'email',
+      };
+    }
+    return { ok: true };
+  }
+
+  @Query(() => RegisterResponse)
+  async usernameCheck(@Arg('username') username: string) {
+    const existingUsername = await User.findOne({ where: { username } });
+    if (existingUsername) {
+      return {
+        ok: false,
+        error: 'Account with the same username already exists',
+        field: 'username',
+      };
+    }
+    return { ok: true };
   }
 
   @Query(() => [User])
