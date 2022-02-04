@@ -26,8 +26,9 @@ const corsOptions = {
   app.use(coockieParser());
   app.use(cors(corsOptions));
 
+  // -- non graphql endpoints
   app.get('/', (_, res) => {
-    res.send('Hello');
+    res.send('Starter endpoint');
   });
 
   app.post('/refresh_token', async (req, res) => {
@@ -60,9 +61,13 @@ const corsOptions = {
 
     return res.send({ ok: true, accessToken: createAccessToken(user) });
   });
+  //--
 
+  // -- db
   await createConnection();
+  // --
 
+  // -- apollo server settings
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [UserResolver],
@@ -76,28 +81,9 @@ const corsOptions = {
     app,
     cors: false,
   });
+  // --
 
   app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}`);
   });
 })();
-
-/*
-createConnection().then(async connection => {
-
-    console.log("Inserting a new user into the database...");
-    const user = new User();
-    user.name = "Timber Saw";
-    user.password = "asdas";
-    user.email = "eow@uamd.ri";
-    await connection.manager.save(user);
-    console.log("Saved a new user with id: " + user.id);
-
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
-
-    console.log("Here you can setup and run express/koa/any other framework.");
-
-}).catch(error => console.log(error));
-*/

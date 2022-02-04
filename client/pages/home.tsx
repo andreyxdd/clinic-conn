@@ -3,6 +3,7 @@ import React from 'react';
 import type { NextPage } from 'next';
 import { Typography } from '@mui/material';
 import Layout from '../layouts/Layout';
+import ShowUsers from '../components/ShowUsers';
 
 /**
  * This is the landing page.
@@ -10,6 +11,8 @@ import Layout from '../layouts/Layout';
  */
 const Home: NextPage = (): JSX.Element => (
   <Layout showNavbar maxWidth='xl' showTransition={false}>
+
+    <ShowUsers />
     <Typography variant='h4' sx={{ mb: 6 }}>
       This is a home page
     </Typography>

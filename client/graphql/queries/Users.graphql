@@ -1,0 +1,9 @@
+query Users {
+  users {
+    username
+    email
+    first_name
+    id
+    tokenVersion
+  }
+}

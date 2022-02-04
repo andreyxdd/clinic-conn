@@ -87,6 +87,7 @@ export type User = {
   id: Scalars['Int'];
   is_verified: Scalars['Boolean'];
   last_name?: Maybe<Scalars['String']>;
+  tokenVersion: Scalars['Float'];
   updated_at: Scalars['DateTime'];
   username: Scalars['String'];
   verified_at?: Maybe<Scalars['DateTime']>;
@@ -125,6 +126,11 @@ export type UsernameCheckQueryVariables = Exact<{
 
 
 export type UsernameCheckQuery = { __typename?: 'Query', usernameCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null } };
+
+export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', username: string, email: string, first_name?: string | null, id: number, tokenVersion: number }> };
 
 
 export const LoginDocument = gql`
@@ -180,4 +186,19 @@ export const UsernameCheckDocument = gql`
 
 export function useUsernameCheckQuery(options: Omit<Urql.UseQueryArgs<UsernameCheckQueryVariables>, 'query'>) {
   return Urql.useQuery<UsernameCheckQuery>({ query: UsernameCheckDocument, ...options });
+};
+export const UsersDocument = gql`
+    query Users {
+  users {
+    username
+    email
+    first_name
+    id
+    tokenVersion
+  }
+}
+    `;
+
+export function useUsersQuery(options?: Omit<Urql.UseQueryArgs<UsersQueryVariables>, 'query'>) {
+  return Urql.useQuery<UsersQuery>({ query: UsersDocument, ...options });
 };

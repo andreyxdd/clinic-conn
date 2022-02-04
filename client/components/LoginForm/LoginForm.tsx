@@ -16,6 +16,9 @@ import requiredFields from './formFields';
 // server
 import { useLoginMutation } from '../../generated/graphql';
 
+// auth
+import { setAccessToken } from '../../config/auth';
+
 const LoginForm = () => {
   // -- required fields
   const [
@@ -67,7 +70,8 @@ const LoginForm = () => {
       });
 
       if (res && res.data?.login) {
-        console.log(res.data.login.accessToken);
+        console.log('set access token in login form', res.data.login.accessToken);
+        setAccessToken(res.data.login.accessToken);
         router.push('/home');
       } else {
         setShowFormHelper(true);

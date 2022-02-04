@@ -49,6 +49,7 @@ class User extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
     updated_at: Date;
 
+  @Field()
   @Column({ type: 'int', default: 0 })
     tokenVersion: number;
 }
