@@ -4,7 +4,6 @@ import {
   Query, Resolver, Mutation, Arg, Ctx, UseMiddleware,
 } from 'type-graphql';
 import { hash, compare } from 'bcryptjs';
-import { verify } from 'jsonwebtoken';
 import {
   createAccessToken, sendRefreshToken, isAuth, revokeRefreshTokensForUser, createRefreshToken,
 } from './auth';
@@ -65,21 +64,14 @@ class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
+  @UseMiddleware(isAuth)
   user(
-    @Ctx() context: AuthContext,
+    @Ctx() { payload }: AuthContext,
   ) {
-    const { authorization } = context.req.headers;
-
-    if (!authorization) { return null; }
-
-    try {
-      const token = authorization?.split(' ')[1];
-      const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+    if (payload?.userId) {
       return User.findOne(payload.userId);
-    } catch (e) {
-      console.log(e);
-      return null;
     }
+    return null;
   }
 
   @Mutation(() => RegisterResponse)

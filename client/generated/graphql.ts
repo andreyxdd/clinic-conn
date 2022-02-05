@@ -99,7 +99,12 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', accessToken: string } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'User', username: string, email: string, first_name?: string | null, id: number, tokenVersion: number } } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type RegisterMutMutationVariables = Exact<{
   password: Scalars['String'];
@@ -120,6 +125,11 @@ export type EmailCheckQueryVariables = Exact<{
 
 export type EmailCheckQuery = { __typename?: 'Query', emailCheck: { __typename?: 'RegisterResponse', ok: boolean, error?: string | null } };
 
+export type UserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', username: string, email: string, first_name?: string | null, id: number, tokenVersion: number } | null };
+
 export type UsernameCheckQueryVariables = Exact<{
   username: Scalars['String'];
 }>;
@@ -137,12 +147,28 @@ export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     accessToken
+    user {
+      username
+      email
+      first_name
+      id
+      tokenVersion
+    }
   }
 }
     `;
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RegisterMutDocument = gql`
     mutation RegisterMut($password: String!, $email: String!, $username: String!, $first_name: String, $last_name: String, $birthday: String) {
@@ -174,6 +200,21 @@ export const EmailCheckDocument = gql`
 
 export function useEmailCheckQuery(options: Omit<Urql.UseQueryArgs<EmailCheckQueryVariables>, 'query'>) {
   return Urql.useQuery<EmailCheckQuery>({ query: EmailCheckDocument, ...options });
+};
+export const UserDocument = gql`
+    query User {
+  user {
+    username
+    email
+    first_name
+    id
+    tokenVersion
+  }
+}
+    `;
+
+export function useUserQuery(options?: Omit<Urql.UseQueryArgs<UserQueryVariables>, 'query'>) {
+  return Urql.useQuery<UserQuery>({ query: UserDocument, ...options });
 };
 export const UsernameCheckDocument = gql`
     query UsernameCheck($username: String!) {

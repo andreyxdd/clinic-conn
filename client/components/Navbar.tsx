@@ -8,14 +8,17 @@ import {
   Button,
   IconButton,
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
 import { navigationPaths } from '../config/paths';
 import { IPathProps } from '../config/types';
+import { setAccessToken } from '../config/auth';
+import { useLogoutMutation, useUserQuery } from '../generated/graphql';
 
-const AuthButton = styled(Button)(({ theme }) => ({
+const AuthButton = styled(LoadingButton)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
   color: theme.palette.primary.main,
   width: 150,
@@ -33,8 +36,16 @@ const Navbar: React.FC<INavbarProps> = (
   { openMobileDrawer, setOpenMobileDrawer },
 ) => {
   const router = useRouter();
-  const userLoggedIn = false;
   const isMobile = useMediaQuery('(max-width:600px)');
+  const [{ data: userData, fetching }] = useUserQuery();
+  const [{ data: logoutData, fetching: logoutFetching }, executeMutation] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    await executeMutation();
+    setAccessToken('');
+    console.log('logoutData', logoutData);
+    router.push('/home');
+  };
 
   const handleNavigationClick = (
     newPath: string,
@@ -93,10 +104,11 @@ const Navbar: React.FC<INavbarProps> = (
                   </Button>
                 ))
               }
-
-              {userLoggedIn ? (
+              {userData && userData?.user && <div>{userData?.user.username}</div>}
+              {userData && userData?.user ? (
                 <AuthButton
-                  onClick={() => {}}
+                  loading={logoutFetching}
+                  onClick={handleLogout}
                   type='button'
                   variant='contained'
                 >
@@ -104,6 +116,7 @@ const Navbar: React.FC<INavbarProps> = (
                 </AuthButton>
               ) : (
                 <AuthButton
+                  loading={fetching}
                   onClick={() => { handleNavigationClick('/login'); }}
                   type='button'
                   variant='contained'

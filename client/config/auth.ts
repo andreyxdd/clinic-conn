@@ -1,5 +1,4 @@
-// Functions to handle run-time value of the access token (on the client side)
-
+// -- Methods to handle run-time value of the access token (on the client side)
 let token = '';
 
 export function setAccessToken(t: string) {
@@ -9,4 +8,4 @@ export function setAccessToken(t: string) {
 export function getAccessToken() {
   return token;
 }
-//--
+// --

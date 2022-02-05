@@ -26,6 +26,7 @@
     "@sendgrid/mail": "^7.6.0",
     "@urql/core": "^2.4.1",
     "@urql/exchange-auth": "^0.1.7",
+    "@urql/exchange-graphcache": "^4.3.6",
     "contentful": "^9.1.4",
     "date-fns": "^2.28.0",
     "graphql": "^16.3.0",
