@@ -1,38 +1,18 @@
 import { sign, verify } from 'jsonwebtoken';
-import { MiddlewareFn } from 'type-graphql';
-import { Response } from 'express';
+import { NextFunction, Response, Request } from 'express';
 import { getConnection } from 'typeorm';
-import User from './entity/User';
-import { AuthContext } from './types';
+import User from './entities/User';
+import { cookiesOptions } from './config';
+// import { AuthContext } from './types';
 
 export const createAccessToken = (user: User) => sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '10m' });
 
 export const createRefreshToken = (user: User) => sign({ userId: user.id, tokenVersion: user.tokenVersion }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
 
-// expectiong user to send a header with authrization field
-export const isAuth: MiddlewareFn<AuthContext> = ({ context }, next) => {
-  const { authorization } = context.req.headers;
-
-  if (!authorization) { throw new Error('Access disallowed: not authenticated'); }
-
-  try {
-    const token = authorization?.split(' ')[1];
-    const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!);
-    context.payload = payload as any;
-  } catch (e) {
-    console.log(e);
-    throw new Error('Access disallowed: not authenticated');
-  }
-
-  return next();
-};
-
-export const sendRefreshToken = (res: Response, refreshToken: string) => {
+export const attachRefreshToken = (res: Response, refreshToken: string) => {
   res.cookie('jid', refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
-    path: '/refresh_token',
+    ...cookiesOptions,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
 
@@ -43,6 +23,26 @@ export const revokeRefreshTokensForUser = async (user: User) => {
     console.log(e);
     return false;
   }
-
   return true;
+};
+
+// expectiong user to send a header with authrization field
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { authorization } = req.headers;
+
+    if (!authorization) {
+      res.status(401);
+      return next(new Error('Access disallowed: not authenticated'));
+    }
+
+    const token = authorization?.split(' ')[1];
+    const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+
+    res.locals.payload = payload;
+  } catch (e) {
+    res.status(500).send({ message: e.message });
+  }
+
+  return next();
 };

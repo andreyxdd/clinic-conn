@@ -1,24 +1,18 @@
 import 'reflect-metadata';
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
-import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
+import { compare } from 'bcryptjs';
 import { verify } from 'jsonwebtoken';
 import coockieParser from 'cookie-parser';
 import cors from 'cors';
-import User from './entity/User';
-import UserResolver from './resolvers';
-import { createAccessToken, createRefreshToken, sendRefreshToken } from './auth';
+import User from './entities/User';
+import {
+  createAccessToken, createRefreshToken,
+  attachRefreshToken, authMiddleware, revokeRefreshTokensForUser,
+} from './auth';
+import { corsOptions, timeToUpdateRefreshToken } from './config/index';
 
 require('dotenv').config();
-
-const corsOptions = {
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token', 'Authorization'],
-  credentials: true, // this allows to send back (to client) cookies
-  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-  origin: 'http://localhost:3000',
-  preflightContinue: false,
-};
 
 (async () => {
   const PORT = process.env.PORT || 4000;
@@ -26,61 +20,132 @@ const corsOptions = {
   app.use(coockieParser());
   app.use(cors(corsOptions));
 
-  // -- non graphql endpoints
+  // -- endpoints
   app.get('/', (_, res) => {
-    res.send('Starter endpoint');
+    res.send('For starters');
+  });
+
+  app.get('/users', async (_, res) => {
+    const users = await User.find();
+    res.send(users);
+  });
+
+  app.post('/login', async (req, res) => {
+    try {
+      const { email, password } = req.query;
+
+      const user = await User.findOne({ where: { email } });
+
+      if (!user) {
+        res.status(404).send({
+          message: 'User with provided email not found',
+        });
+      }
+
+      const valid = await compare(password as string, user!.password);
+
+      if (!valid) {
+        res.status(401).send({
+          message: 'Inalid password provided',
+        });
+      }
+
+      attachRefreshToken(res, createRefreshToken(user!));
+
+      res.status(200).send(
+        {
+          accessToken: createAccessToken(user!),
+          user,
+        },
+      );
+    } catch (e) {
+      res.status(500).send({ message: e.message });
+    }
   });
 
   app.post('/refresh_token', async (req, res) => {
-    const token = req.cookies.jid;
-
-    if (!token) {
-      return res.send({ ok: false, accessToken: '' });
-    }
-
-    let payload: any = null;
     try {
-      payload = verify(token, process.env.REFRESH_TOKEN_SECRET!);
-    } catch (e) {
-      console.log(e);
-      return res.send({ ok: false, accessToken: '' });
-    }
+      const refreshToken = req.cookies.jid;
 
-    // token is valid, and the access token can be send back
-    const user = await User.findOne({ id: payload.userId });
+      if (!refreshToken) {
+        res.send({ ok: false, accessToken: '' });
+      }
+
+      let refreshPayload: any = null;
+
+      refreshPayload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
+
+      // refresh token is valid
+      const user = await User.findOne({ id: refreshPayload.userId });
+
+      if (!user) {
+        res.status(404).send({
+          message: 'User not found',
+        });
+      }
+
+      if (user?.tokenVersion !== refreshPayload.tokenVersion) {
+        res.status(404).send({
+          message: 'Refresh token version do not coincide',
+        });
+      }
+
+      const expiration = new Date(refreshPayload.exp * 1000);
+      const now = new Date();
+      const secondsUntilExpiration = (expiration.getTime() - now.getTime()) / 1000;
+
+      if (secondsUntilExpiration < timeToUpdateRefreshToken) {
+        attachRefreshToken(res, createRefreshToken(user!));
+      }
+
+      res.status(200).send(
+        {
+          accessToken: createAccessToken(user!),
+          user,
+        },
+      );
+    } catch (e) {
+      attachRefreshToken(res, '');
+      res.status(500).send({ message: e.message });
+    }
+  });
+
+  app.post('/logout', authMiddleware, async (_, res) => {
+    attachRefreshToken(res, '');
+    res.status(200);
+  });
+
+  app.post('/revoke_refresh_token', authMiddleware, async (_, res) => {
+    const id = res.locals.payload.userId;
+    const user = await User.findOne({ where: { id } });
 
     if (!user) {
-      return res.send({ ok: false, accessToken: '' });
+      res.status(404).send({
+        message: 'User with given Id not found',
+      });
     }
 
-    if (user.tokenVersion !== payload.tokenVersion) {
-      return res.send({ ok: false, accessToken: '' });
+    const revokedStatus = await revokeRefreshTokensForUser(user!);
+
+    res.status(revokedStatus ? 200 : 500);
+  });
+
+  app.get('/user', authMiddleware, async (_, res) => {
+    const id = res.locals.payload.userId;
+    const user = await User.findOne({ where: { id } });
+
+    if (!user) {
+      res.status(404).send({
+        message: 'User with given Id not found',
+      });
     }
 
-    sendRefreshToken(res, createRefreshToken(user));
-
-    return res.send({ ok: true, accessToken: createAccessToken(user) });
+    res.json(user);
   });
   //--
 
   // -- db
   await createConnection();
-  // --
-
-  // -- apollo server settings
-  const apolloServer = new ApolloServer({
-    schema: await buildSchema({
-      resolvers: [UserResolver],
-    }),
-    context: ({ req, res }) => ({ req, res }),
-  });
-
-  await apolloServer.start();
-
-  apolloServer.applyMiddleware({
-    app,
-    cors: false,
-  });
   // --
 
   app.listen(PORT, () => {

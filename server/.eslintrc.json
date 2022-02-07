@@ -13,17 +13,8 @@
     "sourceType": "module"
   },
   "plugins": ["react", "@typescript-eslint"],
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
-      }
-    }
-  },
-  "ignorePatterns": ["src/graphql/generated.tsx"],
   "rules": {
     "quotes": ["error", "single"],
-    "jsx-quotes": ["error", "prefer-single"],
     // we want to force semicolons
     "semi": ["error", "always"],
     // we use 2 spaces to indent our code
@@ -36,14 +27,15 @@
       "ignorePackages",
       {
         "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
-      }],
-    "react/jsx-filename-extension": [
-      2,
-      {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"] 
-      }]
+        "ts": "never"
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"]
+      }
+    }
   }
 }
