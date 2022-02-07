@@ -11,3 +11,8 @@ export interface IPathProps{
   title: string;
   path: string;
 }
+
+export interface IUser {
+  id: string;
+  username: string;
+}

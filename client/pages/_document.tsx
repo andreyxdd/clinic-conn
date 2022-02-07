@@ -6,6 +6,9 @@ import Document, {
 import createEmotionServer from '@emotion/server/create-instance';
 import theme from '../styles/theme';
 import createEmotionCache from '../lib/createEmotionCache';
+import fetcherSSR from '../lib/fetcherSSR';
+import env from '../lib/env';
+import { IUser } from '../config/types';
 
 export default class MyDocument extends Document {
   render() {
@@ -92,13 +95,28 @@ MyDocument.getInitialProps = async (ctx) => {
   const cache = createEmotionCache();
   const { extractCriticalToChunks } = createEmotionServer(cache);
 
+  // -- prerender user info
+  let userCache: any;
+  if (ctx.req && ctx.res) {
+    const { error, data: user } = await fetcherSSR<IUser>(
+      ctx.req, ctx.res, `${env.serverUri}/user`,
+    );
+    if (!error || user) {
+      userCache = { user };
+    }
+
+    console.log('_document userCache', userCache);
+  }
+  //--
+
   ctx.renderPage = () => originalRenderPage({
     // eslint-disable-next-line react/display-name
     // eslint-disable-next-line func-names
     // eslint-disable-next-line react/display-name
     enhanceApp: (App: any) => (props) =>
       // eslint-disable-next-line react/jsx-props-no-spreading
-      <App emotionCache={cache} {...props} />,
+      <App emotionCache={cache} userCache={userCache} {...props} />
+    ,
   });
 
   const initialProps = await Document.getInitialProps(ctx);

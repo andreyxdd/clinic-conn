@@ -15,8 +15,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
 import { navigationPaths } from '../config/paths';
 import { IPathProps } from '../config/types';
-import { setAccessToken } from '../config/auth';
-import { useLogoutMutation, useUserQuery } from '../generated/graphql';
+import { useUser } from '../context/userContext';
+// import { IPathProps, IUser } from '../config/types';
+// import env from '../lib/env';
+// import fetcher from '../lib/fetcher';
 
 const AuthButton = styled(LoadingButton)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
@@ -37,14 +39,30 @@ const Navbar: React.FC<INavbarProps> = (
 ) => {
   const router = useRouter();
   const isMobile = useMediaQuery('(max-width:600px)');
-  const [{ data: userData, fetching }] = useUserQuery();
-  const [{ data: logoutData, fetching: logoutFetching }, executeMutation] = useLogoutMutation();
+  // eslint-disable-next-line no-unused-vars
+  const { user, setUser } = useUser();
+
+  React.useLayoutEffect(() => {
+    console.log('navabr useefect1', user);
+  }, [user]);
+
+  React.useLayoutEffect(() => {
+    console.log('navabr useefect2', user);
+  }, []);
+
+  console.log('navabr', user);
+
+  // eslint-disable-next-line no-unused-vars
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleLogout = async () => {
+    console.log('Logout!');
+    /*
     await executeMutation();
     setAccessToken('');
     console.log('logoutData', logoutData);
     router.push('/home');
+    */
   };
 
   const handleNavigationClick = (
@@ -72,6 +90,7 @@ const Navbar: React.FC<INavbarProps> = (
           </IconButton>
           <Typography variant='h5' component='div' sx={{ flexGrow: 1 }}>
             WorldMedExpo
+            {user && <div>{user.username}</div>}
           </Typography>
           {isMobile ? (
             <IconButton
@@ -104,10 +123,9 @@ const Navbar: React.FC<INavbarProps> = (
                   </Button>
                 ))
               }
-              {userData && userData?.user && <div>{userData?.user.username}</div>}
-              {userData && userData?.user ? (
+              {user ? (
                 <AuthButton
-                  loading={logoutFetching}
+                  loading={isLoading}
                   onClick={handleLogout}
                   type='button'
                   variant='contained'
@@ -116,7 +134,7 @@ const Navbar: React.FC<INavbarProps> = (
                 </AuthButton>
               ) : (
                 <AuthButton
-                  loading={fetching}
+                  loading={isLoading}
                   onClick={() => { handleNavigationClick('/login'); }}
                   type='button'
                   variant='contained'

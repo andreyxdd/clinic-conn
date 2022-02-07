@@ -1,6 +1,0 @@
-query EmailCheck($email: String!){
-  emailCheck(email: $email){
-    ok
-    error
-  }
-}

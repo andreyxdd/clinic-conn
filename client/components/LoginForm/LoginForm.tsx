@@ -7,14 +7,13 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
+import axios from 'axios';
 import { useRouter } from 'next/router';
+import env from '../../lib/env';
 
 // custom
 import Input, { IInputProps } from '../Input';
 import requiredFields from './formFields';
-
-// server
-import { useLoginMutation, useUserQuery } from '../../generated/graphql';
 
 // auth
 import { setAccessToken } from '../../config/auth';
@@ -37,14 +36,13 @@ const LoginForm = () => {
       requiredForm.findIndex(({ id }) => id === idToFind)
     ].value
   );
+
   // --
 
   // -- submit button state
   const [disabledSubmit, setDisabledSubmit] = React.useState(true);
   const [showFormHelper, setShowFormHelper] = React.useState(false);
   const [helper, setHelper] = React.useState('');
-  const [{ data }] = useUserQuery();
-  const [, login] = useLoginMutation();
   const router = useRouter();
 
   React.useEffect(() => {
@@ -63,17 +61,17 @@ const LoginForm = () => {
     } else {
       setShowFormHelper(false);
 
-      console.log('submitted!!');
+      console.log('login form submitted!!');
 
-      const res = await login({
-        email: findRequiredFieldValue('email'),
-        password: findRequiredFieldValue('password'),
-      });
+      const res = await axios.post(`${env.serverUri}/login`,
+        {
+          email: findRequiredFieldValue('email'),
+          password: findRequiredFieldValue('password'),
+        },
+        { withCredentials: true });
 
-      if (res && res.data?.login) {
-        console.log('set access token in login form', res.data.login.accessToken);
-
-        setAccessToken(res.data.login.accessToken);
+      if (res && res.data.accessToken) {
+        setAccessToken(res.data.accessToken);
         router.push('/home');
       } else {
         setShowFormHelper(true);
@@ -95,66 +93,59 @@ const LoginForm = () => {
       <Avatar sx={{ m: 1, bgcolor: 'primary.light' }}>
         <LockOutlinedIcon />
       </Avatar>
-      {data && data.user ? (
-        <Typography component='h1' variant='h5'>
-          You are already logged in
-        </Typography>
-      ) : (
-        <>
-          <Typography component='h1' variant='h5'>
-            Login
-          </Typography>
-          <Box component='form' onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              {requiredForm.map((field: IInputProps, idx: number) => (
-                <Input
-                  id={field.id}
-                  label={field.label}
-                  name={field.name}
-                  autoComplete={field.autoComplete}
-                  type={field.type}
-                  required={field.required}
-                  handleChange={handleRequiredFormChange(idx)}
-                  value={requiredForm[idx].value}
-                  halfWidth={field.halfWidth}
-                  validator={field.validator}
-                  valueToConfirm={
-                    requiredForm[
-                      requiredForm.findIndex(({ id }) => id === 'password')
-                    ].value
-                  }
-                  setDisabledSubmit={setDisabledSubmit}
-                  key={field.label}
-                />
-              ))}
-              {showFormHelper && (
-                <Grid container justifyContent='center'>
-                  <Grid item>
-                    <FormHelperText error id='form-helper-text'>
-                      {helper}
-                    </FormHelperText>
-                  </Grid>
-                </Grid>
-              )}
-            </Grid>
-            <Button
-              type='submit'
-              fullWidth
-              variant='contained'
-              sx={{ mt: 1, mb: 2 }}
-            >
-              Login
-            </Button>
-            <Grid container justifyContent='flex-end'>
+      <Typography component='h1' variant='h5'>
+        Login
+      </Typography>
+      <Box component='form' onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        <Grid container spacing={2}>
+          {requiredForm.map((field: IInputProps, idx: number) => (
+            <Input
+              id={field.id}
+              label={field.label}
+              name={field.name}
+              autoComplete={field.autoComplete}
+              type={field.type}
+              required={field.required}
+              handleChange={handleRequiredFormChange(idx)}
+              value={requiredForm[idx].value}
+              halfWidth={field.halfWidth}
+              validator={field.validator}
+              valueToConfirm={
+                requiredForm[
+                  requiredForm.findIndex(({ id }) => id === 'password')
+                ].value
+              }
+              setDisabledSubmit={setDisabledSubmit}
+              key={field.label}
+            />
+          ))}
+          {showFormHelper && (
+            <Grid container justifyContent='center'>
               <Grid item>
-                <Link href='/register' variant='body2'>
-                  Don&apos;t have an account? Register
-                </Link>
+                <FormHelperText error id='form-helper-text'>
+                  {helper}
+                </FormHelperText>
               </Grid>
             </Grid>
-          </Box>
-        </>
-      )}
+          )}
+        </Grid>
+        <Button
+          type='submit'
+          fullWidth
+          variant='contained'
+          sx={{ mt: 1, mb: 2 }}
+        >
+          Login
+        </Button>
+        <Grid container justifyContent='flex-end'>
+          <Grid item>
+            <Link href='/register' variant='body2'>
+              Don&apos;t have an account? Register
+            </Link>
+          </Grid>
+        </Grid>
+      </Box>
+
     </Box>
   );
 };

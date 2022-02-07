@@ -1,21 +1,12 @@
 import { CircularProgress, Typography, Button } from '@mui/material';
 import React from 'react';
-import { useUsersQuery } from '../generated/graphql';
 
 interface IShowUsersProps {}
 
 const ShowUsers: React.FC<IShowUsersProps> = () => {
-  const [query, setQuery] = React.useState(true);
-  const [result, executeQuery] = useUsersQuery({
-    pause: query,
-  });
+  const handleClick = () => {};
 
-  const handleClick = () => {
-    setQuery(true);
-    executeQuery();
-  };
-
-  const { data, fetching, error } = result;
+  const { data, fetching, error } = { data: { users: [] }, fetching: true, error: '' };
 
   if (fetching) return <CircularProgress />;
   if (error) {
@@ -23,7 +14,7 @@ const ShowUsers: React.FC<IShowUsersProps> = () => {
       <p>
         Oh no...
         {' '}
-        {error.message}
+        {error}
       </p>
     );
   }

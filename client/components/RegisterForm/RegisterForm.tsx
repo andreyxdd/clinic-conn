@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -21,8 +22,14 @@ import { useRouter } from 'next/router';
 import Input, { IInputProps } from '../Input';
 import { requiredFields, additionalFields } from './formFields';
 
-// server
-import { useRegisterMutMutation } from '../../generated/graphql';
+interface tempRegi{
+  email: string | null;
+  username: string | null;
+  password: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  birthday: string | null;
+}
 
 const RegisterForm = () => {
   // -- required fields
@@ -73,7 +80,7 @@ const RegisterForm = () => {
   const [disabledSubmit, setDisabledSubmit] = React.useState(true);
   const [showFormHelper, setShowFormHelper] = React.useState(false);
   const [helper, setHelper] = React.useState('');
-  const [, register] = useRegisterMutMutation();
+  const register = async (prop: tempRegi) => { console.log(prop); };
   const router = useRouter();
 
   React.useEffect(() => {
@@ -108,13 +115,11 @@ const RegisterForm = () => {
         birthday:
           birthdayField !== null ? format(birthdayField, 'yyyy-MM-dd') : null,
       });
+      console.log(res);
 
-      if (res.data?.register.ok) {
-        router.push('/home');
-      } else {
-        setShowFormHelper(true);
-        setHelper(res.data?.register.error || 'Internal error');
-      }
+      router.push('/home');
+      setShowFormHelper(true);
+      setHelper('Internal error');
     }
   };
   // --
