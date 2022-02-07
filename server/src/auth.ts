@@ -3,7 +3,6 @@ import { NextFunction, Response, Request } from 'express';
 import { getConnection } from 'typeorm';
 import User from './entities/User';
 import { cookiesOptions } from './config';
-// import { AuthContext } from './types';
 
 export const createAccessToken = (user: User) => sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '10m' });
 
@@ -28,21 +27,27 @@ export const revokeRefreshTokensForUser = async (user: User) => {
 
 // expectiong user to send a header with authrization field
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { authorization } = req.headers;
+  const { authorization } = req.headers;
 
-    if (!authorization) {
-      res.status(401);
-      return next(new Error('Access disallowed: not authenticated'));
-    }
+  console.log(authorization);
 
-    const token = authorization?.split(' ')[1];
-    const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!);
-
-    res.locals.payload = payload;
-  } catch (e) {
-    res.status(500).send({ message: e.message });
+  if (!authorization) {
+    res.status(401);
+    return next(new Error('Access disallowed: not authenticated'));
   }
 
-  return next();
+  const token = authorization?.split(' ')[1];
+  if (!token) {
+    res.status(401);
+    return next(new Error('Access disallowed: not authenticated'));
+  }
+
+  try {
+    const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+    res.locals.payload = payload;
+    return next();
+  } catch (e) {
+    res.status(401);
+    return next(new Error('Access disallowed: not authenticated'));
+  }
 };

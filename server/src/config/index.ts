@@ -15,7 +15,7 @@ export const cookiesOptions: CookieOptions = {
   secure: isProduction,
   sameSite: (isProduction ? 'strict' : 'lax'),
   domain: process.env.BASE_DOMAIN,
-  path: '/refresh_token',
+  path: '/',
 };
 
 export const timeToUpdateRefreshToken = 4 * 24 * 60 * 60; // five days

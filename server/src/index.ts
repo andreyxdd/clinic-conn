@@ -20,19 +20,22 @@ require('dotenv').config();
   app.use(coockieParser());
   app.use(cors(corsOptions));
 
+  app.use(
+    express.urlencoded({
+      extended: true,
+    }),
+  );
+
+  app.use(express.json());
+
   // -- endpoints
   app.get('/', (_, res) => {
     res.send('For starters');
   });
 
-  app.get('/users', async (_, res) => {
-    const users = await User.find();
-    res.send(users);
-  });
-
   app.post('/login', async (req, res) => {
     try {
-      const { email, password } = req.query;
+      const { email, password } = req.body;
 
       const user = await User.findOne({ where: { email } });
 
@@ -63,7 +66,7 @@ require('dotenv').config();
     }
   });
 
-  app.post('/refresh_token', async (req, res) => {
+  app.post('/refresh_access_token', async (req, res) => {
     try {
       const refreshToken = req.cookies.jid;
 
@@ -132,7 +135,9 @@ require('dotenv').config();
 
   app.get('/user', authMiddleware, async (_, res) => {
     const id = res.locals.payload.userId;
-    const user = await User.findOne({ where: { id } });
+    const user = await User.findOne(
+      { where: { id }, select: ['username', 'email', 'id'] },
+    );
 
     if (!user) {
       res.status(404).send({
@@ -141,6 +146,11 @@ require('dotenv').config();
     }
 
     res.json(user);
+  });
+
+  app.get('/users', authMiddleware, async (_, res) => {
+    const users = await User.find({ select: ['username', 'email', 'id'] });
+    res.send(users);
   });
   //--
 
