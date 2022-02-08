@@ -4,36 +4,35 @@ import Typography from '@mui/material/Typography';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import Layout from '../layouts/Layout';
-import useUserCSR from '../customHooks/useUserCSR';
+import SkeletonLoader from '../components/LoginForm/SkeletonLoader';
+import { IUser } from '../config/types';
+import withUser from '../lib/api/SSR/getProps';
 
-const LoginForm = dynamic(() => import('../components/LoginForm/LoginForm'));
+export const getServerSideProps = withUser();
 
-interface ILoginPageProps { }
+const LoginForm = dynamic(() => import('../components/LoginForm/LoginForm'),
+  { loading: () => <SkeletonLoader />, ssr: false });
 
-const Login: NextPage<ILoginPageProps> = () => {
+interface ILoginPageProps {
+  user: IUser;
+}
+
+const Login: NextPage<ILoginPageProps> = ({ user }) => {
   const router = useRouter();
-  const { user } = useUserCSR();
-  const [showLoginForm, setShowLoginForm] = React.useState(false);
-
   React.useEffect(() => {
-    // fetcher returns null if unauthorized
-    if (user && user === null) {
-      setShowLoginForm(true);
-    } else {
+    if (user) {
       setTimeout(() => {
         router.push('/home');
       }, 6000);
     }
   }, [user]);
-
   return (
     <Layout
       showNavbar={false}
       showTransition={false}
       maxWidth='xs'
     >
-
-      {showLoginForm ? (
+      {!user ? (
         <LoginForm />
       ) : (
         <Typography
@@ -52,5 +51,4 @@ const Login: NextPage<ILoginPageProps> = () => {
     </Layout>
   );
 };
-
 export default Login;

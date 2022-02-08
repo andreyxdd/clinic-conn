@@ -9,7 +9,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import env from '../../lib/env';
+import env from '../../config/env';
 
 // custom
 import Input, { IInputProps } from '../Input';
@@ -63,16 +63,23 @@ const LoginForm = () => {
 
       console.log('login form submitted!!');
 
-      const res = await axios.post(`${env.serverUri}/login`,
+      const res = await axios.post(`${env.api}/login`,
         {
           email: findRequiredFieldValue('email'),
           password: findRequiredFieldValue('password'),
         },
         { withCredentials: true });
 
-      if (res && res.data.accessToken) {
-        setAccessToken(res.data.accessToken);
-        router.push('/home');
+      console.log(res);
+
+      if (res) {
+        if (res.data.accessToken) {
+          setAccessToken(res.data.accessToken);
+          router.push('/home');
+        } else {
+          setShowFormHelper(true);
+          setHelper('Internal Server error');
+        }
       } else {
         setShowFormHelper(true);
         setHelper('Internal Server error');

@@ -5,7 +5,7 @@ import Document, {
 } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 import theme from '../styles/theme';
-import createEmotionCache from '../lib/createEmotionCache';
+import createEmotionCache from '../lib/emotion/createEmotionCache';
 
 export default class MyDocument extends Document {
   render() {
@@ -38,6 +38,10 @@ export default class MyDocument extends Document {
           <link
             href='https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;900&display=swap'
             rel='stylesheet'
+          />
+          <script
+            src='https://kit.fontawesome.com/4b9ba14b0f.js'
+            crossOrigin='anonymous'
           />
           <link
             rel='stylesheet'

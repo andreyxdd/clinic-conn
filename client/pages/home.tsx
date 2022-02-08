@@ -3,7 +3,7 @@ import React from 'react';
 import type { NextPage } from 'next';
 import { Typography } from '@mui/material';
 import Layout from '../layouts/Layout';
-import withUser from '../lib/getProps';
+import withUser from '../lib/api/SSR/getProps';
 import { useUser } from '../context/userContext';
 import { IUser } from '../config/types';
 
@@ -20,6 +20,7 @@ interface IHomePageProps{
 const Home: NextPage<IHomePageProps> = ({ user }): JSX.Element => {
   const { setUser } = useUser();
 
+  // setting user interface in context
   React.useEffect(() => {
     if (user) { setUser(user); }
   }, [user]);

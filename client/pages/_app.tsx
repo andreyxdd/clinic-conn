@@ -7,7 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 // import Router, { useRouter } from 'next/router';
 import theme from '../styles/theme';
-import createEmotionCache from '../lib/createEmotionCache';
+import createEmotionCache from '../lib/emotion/createEmotionCache';
 import '../styles/globals.css';
 import { UserProvider } from '../context/userContext';
 import { IUser } from '../config/types';

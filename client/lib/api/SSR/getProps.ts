@@ -1,9 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-
-import { IUser } from '../config/types';
-
-import env from './env';
-import { QueryResponse } from './fetcher';
+import { IUser, QueryResponse } from '../../../config/types';
+import env from '../../../config/env';
 import fetcherSSR from './fetcherSSR';
 
 interface IGetProps {
@@ -24,9 +21,9 @@ export default function withUser <T1>(
   getProps?: (params: IGetProps) => Promise<GetServerSidePropsResult<T1>>,
 ) {
   async function getServerSideProps(context: any): Promise<GetServerSideProps<T1>> {
+    // fetcher may work with other data interface
     async function fetcher<T2>(uri: string) { return (fetcherSSR<T2>(context.req, context.res, uri)); }
-
-    const { error, data: user } = await fetcher<IUser>(`${env.serverUri}/user`);
+    const { error, data: user } = await fetcher<IUser>(`${env.api}/user`);
 
     if (redirect) {
       if (error || !user) {

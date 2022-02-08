@@ -17,7 +17,7 @@ export const useStore = create<IUserStore>((set) => ({
 import { useLayoutEffect } from 'react';
 import create, { StoreApi, UseBoundStore } from 'zustand';
 import createContext from 'zustand/context';
-import { IUser } from './types';
+import { IUser } from '../config/types';
 
 const initialState = {
   user: undefined,

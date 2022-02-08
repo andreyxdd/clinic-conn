@@ -42,16 +42,6 @@ const Navbar: React.FC<INavbarProps> = (
   // eslint-disable-next-line no-unused-vars
   const { user, setUser } = useUser();
 
-  React.useLayoutEffect(() => {
-    console.log('navabr useefect1', user);
-  }, [user]);
-
-  React.useLayoutEffect(() => {
-    console.log('navabr useefect2', user);
-  }, []);
-
-  console.log('navabr', user);
-
   // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = React.useState(false);
 

@@ -1,15 +1,15 @@
 import axios, { AxiosResponse } from 'axios';
 import { IncomingMessage, ServerResponse } from 'http';
-import { getAccessToken, setAccessToken } from '../config/auth';
-import env from './env';
-import getError from './errors';
-import { QueryResponse } from './fetcher';
+import { getAccessToken, setAccessToken } from '../../../config/auth';
+import env from '../../../config/env';
+import { handleError } from '../index';
+import { QueryResponse } from '../../../config/types';
 
 const SET_COOKIE_HEADER = 'set-cookie';
 
-const refreshTokens = async (req: IncomingMessage, res: ServerResponse) => {
+const refreshTokensSSR = async (req: IncomingMessage, res: ServerResponse) => {
   const response = await axios.post(
-    `${env.serverUri}/refresh_access_token`,
+    `${env.api}/refresh_access_token`,
     undefined, {
       headers: { cookie: String(req.headers.cookie) },
     },
@@ -24,7 +24,7 @@ const refreshTokens = async (req: IncomingMessage, res: ServerResponse) => {
   }
 };
 
-const handleRequest = async (
+const handleRequestSSR = async (
   req: IncomingMessage,
   res: ServerResponse,
   request: () => Promise<AxiosResponse>,
@@ -34,14 +34,14 @@ const handleRequest = async (
   } catch (error: any) {
     if (error?.response?.status === 401) {
       try {
-        await refreshTokens(req, res);
+        await refreshTokensSSR(req, res);
         return await request();
       } catch (innerError: any) {
-        throw getError(innerError);
+        throw handleError(innerError);
       }
     }
 
-    throw getError(error);
+    throw handleError(error);
   }
 };
 
@@ -55,7 +55,7 @@ export default async function fetcherSSR <T>(
       uri,
       { headers: { authorization: `bearer ${getAccessToken()}` } },
     );
-    const { data } = await handleRequest(req, res, request);
+    const { data } = await handleRequestSSR(req, res, request);
 
     return { error: null, data };
   } catch (error: any) {
