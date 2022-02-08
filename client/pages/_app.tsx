@@ -23,21 +23,11 @@ interface IAppProps extends AppProps {
 
 const App = (props: IAppProps) => {
   const {
-    Component, emotionCache = clientSideEmotionCache, pageProps, userCache,
+    Component, emotionCache = clientSideEmotionCache, pageProps,
   } = props;
 
-  React.useEffect(() => {
-    console.log('App tsx useeffect 1', pageProps?.user);
-  }, []);
-
-  React.useEffect(() => {
-    console.log('App tsx useeffect 2', pageProps);
-  }, [pageProps]);
-
-  // console.log('App tsx', userCache);
-
   return (
-    <UserProvider initialUser={userCache}>
+    <UserProvider>
       <CacheProvider value={emotionCache}>
         <Head>
           <title>WorldMedExpo</title>

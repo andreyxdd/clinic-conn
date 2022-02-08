@@ -1,15 +1,15 @@
 /* eslint-disable max-len */
 import React from 'react';
-// import type { NextPage } from 'next';
+import type { NextPage } from 'next';
 import { Typography } from '@mui/material';
 import Layout from '../layouts/Layout';
-import { withUser } from '../lib/getProps';
+import withUser from '../lib/getProps';
 import { useUser } from '../context/userContext';
 import { IUser } from '../config/types';
 
 export const getServerSideProps = withUser();
 
-interface IHomeProps{
+interface IHomePageProps{
   user: IUser;
 }
 
@@ -17,12 +17,12 @@ interface IHomeProps{
  * This is the landing page.
  * @return {JSX.Element}
  */
-const Home = ({ user }: IHomeProps): JSX.Element => {
+const Home: NextPage<IHomePageProps> = ({ user }): JSX.Element => {
   const { setUser } = useUser();
 
   React.useEffect(() => {
-    setUser(user);
-  }, []);
+    if (user) { setUser(user); }
+  }, [user]);
 
   return (
     <Layout showNavbar maxWidth='xl' showTransition={false}>

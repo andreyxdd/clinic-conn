@@ -1,11 +1,18 @@
 import axios, { AxiosResponse } from 'axios';
+import { getAccessToken, setAccessToken } from '../config/auth';
 import environment from './env';
 import getError from './errors';
 
 export type QueryResponse<T> = { error: string | null, data: T | null }
 
 export const refreshTokens = async () => {
-  await axios.post(`${environment.serverUri}/refresh_token`, undefined, { withCredentials: true });
+  const response = await axios.post(
+    `${environment.serverUri}/refresh_access_token`,
+    undefined,
+    { withCredentials: true },
+  );
+
+  setAccessToken(response.data.accessToken);
 };
 
 const handleRequest = async (request: () => Promise<AxiosResponse>): Promise<AxiosResponse> => {
@@ -27,7 +34,13 @@ const handleRequest = async (request: () => Promise<AxiosResponse>): Promise<Axi
 
 async function fetcher<T>(uri: string): Promise<QueryResponse<T>> {
   try {
-    const request = () => (axios.get(uri, { withCredentials: true }));
+    const request = () => (
+      axios.get(uri,
+        {
+          withCredentials: true,
+          headers: { authorization: `bearer ${getAccessToken()}` },
+        })
+    );
     const { data } = await handleRequest(request);
     return { error: null, data };
   } catch (error: any) {
