@@ -37,8 +37,20 @@ const Layout: React.FC<ILayoutProps> = ({
             setOpenMobileDrawer(false);
           }
         }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+        }}
       >
-        <div style={{ marginTop: 100, marginBottom: 20 }}>{children}</div>
+        <div style={{
+          marginTop: 100,
+          marginBottom: 20,
+          flexGrow: 1,
+        }}
+        >
+          {children}
+        </div>
         <Copyright />
       </Container>
       <MobileDrawer

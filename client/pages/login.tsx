@@ -2,43 +2,29 @@ import React from 'react';
 import { NextPage } from 'next';
 import Typography from '@mui/material/Typography';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import Layout from '../layouts/Layout';
 import SkeletonLoader from '../components/LoginForm/SkeletonLoader';
-import { IUser } from '../config/types';
-import withUser from '../lib/api/ssr/getProps';
-
-export const getServerSideProps = withUser();
+import useUserRedirect from '../customHooks/useRedirect';
 
 const LoginForm = dynamic(
   () => import('../components/LoginForm/LoginForm'),
   { loading: () => <SkeletonLoader />, ssr: false },
 );
 
-interface ILoginPageProps {
-  user: IUser;
-}
+interface ILoginPageProps {}
 
-const Login: NextPage<ILoginPageProps> = ({ user }) => {
-  const router = useRouter();
-  React.useEffect(() => {
-    if (user) {
-      setTimeout(() => {
-        router.push('/hospitals');
-      }, 6000);
-    }
-  }, [user]);
+const Login: NextPage<ILoginPageProps> = () => {
+  const isUser = useUserRedirect({ after: 6, where: '/home' });
   return (
     <Layout
       showNavbar={false}
       showTransition={false}
       maxWidth='xs'
     >
-      {!user ? (
+      {!isUser ? (
         <LoginForm />
       ) : (
         <Typography
-          component='h1'
           variant='h5'
           sx={{
             fontStyle: 'italic',

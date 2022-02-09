@@ -1,11 +1,12 @@
 import React from 'react';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
-import { Typography, Button } from '@mui/material';
+import { Typography, Button, Grid } from '@mui/material';
+import Link from 'next/link';
+import Layout from '../layouts/Layout';
 
 export async function getStaticProps() {
   return {
-    props: {}, // will be passed to the page component as props
+    props: {},
   };
 }
 
@@ -14,24 +15,42 @@ export async function getStaticProps() {
  * @return {JSX.Element}
  */
 // eslint-disable-next-line no-unused-vars
-const Landing: NextPage = (props): JSX.Element => {
-  const router = useRouter();
-  const handleClick = () => {
-    router.push('/home');
-  };
-  return (
-    <div>
-      <Typography variant='h4'>
-        This is a landing page
-      </Typography>
-      <Typography variant='body1'>
-        This page helps better understand out business model.
-      </Typography>
-      <Button onClick={handleClick} variant='outlined' type='button'>
-        Procced to home page
-      </Button>
-    </div>
-  );
-};
+const Landing: NextPage = (props): JSX.Element => (
+  <Layout
+    showNavbar={false}
+    showTransition={false}
+    maxWidth='xs'
+  >
+    <Grid
+      container
+      spacing={2}
+      alignItems='center'
+      justifyContent='center'
+      direction='column'
+    >
+      <Grid item>
+        <Typography variant='h4'>
+          This is a landing page
+        </Typography>
+      </Grid>
+      <Grid item>
+        <Typography variant='body1' align='center'>
+          This page helps better understand our business model. Plus, it&apos;s easily accessable for SEO.
+        </Typography>
+      </Grid>
+      <Grid item>
+        <Link href='/home' passHref>
+          <Button
+            variant='contained'
+            type='button'
+            size='large'
+          >
+            Procced to home page
+          </Button>
+        </Link>
+      </Grid>
+    </Grid>
+  </Layout>
+);
 
 export default Landing;

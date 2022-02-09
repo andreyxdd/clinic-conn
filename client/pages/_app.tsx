@@ -11,6 +11,9 @@ import createEmotionCache from '../lib/emotion/createEmotionCache';
 import '../styles/globals.css';
 import { UserProvider } from '../context/userContext';
 import { IUser } from '../config/types';
+import fetcher from '../lib/api/csr/fetcher';
+import env from '../config/env';
+import useSessionStorage from '../customHooks/useSessionStorage';
 
 // Client-side cache, shared for the whole session of the user in the browser
 const clientSideEmotionCache = createEmotionCache();
@@ -26,8 +29,25 @@ const App = (props: IAppProps) => {
     Component, emotionCache = clientSideEmotionCache, pageProps,
   } = props;
 
+  const [user, setUser] = useSessionStorage<IUser | null>('user');
+
+  React.useEffect(() => {
+    const getUser = async () => {
+      const { error, data } = await fetcher<IUser>(`${env.api}/user/get`);
+      if (!error && data) {
+        console.log('before set user', user);
+        setUser(data);
+        console.log('after set user', user);
+      } else {
+        setUser(null);
+      }
+    };
+
+    if (!user) getUser();
+  }, []);
+
   return (
-    <UserProvider>
+    <UserProvider initialContext={{ user, setUser }}>
       <CacheProvider value={emotionCache}>
         <Head>
           <title>WorldMedExpo</title>

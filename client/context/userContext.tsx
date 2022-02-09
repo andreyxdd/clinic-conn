@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import { IUser } from '../config/types';
 
 export interface IUserContext {
   user?: IUser | null;
   // eslint-disable-next-line no-unused-vars
-  setUser: React.Dispatch<React.SetStateAction<IUser | null | undefined>>;
+  setUser: (value: IUser | null) => void; // React.Dispatch<React.SetStateAction<IUser | null >>;
 }
 
 export const UserContext = createContext<IUserContext>(null!);
@@ -14,18 +14,14 @@ export function useUser() {
 }
 
 export interface IUserProvider {
-  initialUser?: IUser;
+  initialContext: IUserContext;
   children: React.ReactNode;
 }
 
 export const UserProvider = (
-  { initialUser, children }: IUserProvider,
-) => {
-  const [user, setUser] = useState<IUser | null | undefined>(initialUser);
-
-  return (
-    <UserContext.Provider value={{ user, setUser }}>
-      {children}
-    </UserContext.Provider>
-  );
-};
+  { initialContext, children }: IUserProvider,
+) => (
+  <UserContext.Provider value={initialContext}>
+    {children}
+  </UserContext.Provider>
+);

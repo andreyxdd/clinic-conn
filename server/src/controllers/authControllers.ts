@@ -79,8 +79,6 @@ export const refreshTokens = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies.jid;
 
-    // console.log('From referesh token', refreshToken);
-
     if (!refreshToken) {
       res.send({ ok: false, accessToken: '' });
     }
