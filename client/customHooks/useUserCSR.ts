@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { IUser } from '../config/types';
 import { useUser } from '../context/userContext';
-import fetcher from '../lib/api/CSR/fetcher';
+import fetcher from '../lib/api/csr/fetcher';
 import env from '../config/env';
 
 const useUserCSR = () => {

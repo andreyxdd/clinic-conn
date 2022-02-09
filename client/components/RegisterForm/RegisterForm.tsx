@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -17,18 +16,17 @@ import DatePicker from '@mui/lab/DatePicker';
 import TextField from '@mui/material/TextField';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
+import { LoadingButton } from '@mui/lab';
+import poster from '../../lib/api/csr/poster';
+import env from '../../config/env';
 
 // custom
 import Input, { IInputProps } from '../Input';
 import { requiredFields, additionalFields } from './formFields';
 
-interface tempRegi{
-  email: string | null;
-  username: string | null;
-  password: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  birthday: string | null;
+interface IRegisterResponse{
+  ok: boolean;
+  error?: string;
 }
 
 const RegisterForm = () => {
@@ -69,9 +67,6 @@ const RegisterForm = () => {
       additionalForm.findIndex(({ id }) => id === idToFind)
     ]?.value;
 
-    console.log('%cRegisterForm.tsx line:67 idToFind', 'color: #007acc;', idToFind);
-    console.log('%cRegisterForm.tsx line:67 additionalForm', 'color: #007acc;', additionalForm[0]?.value);
-
     return val || null;
   };
   //--
@@ -80,7 +75,7 @@ const RegisterForm = () => {
   const [disabledSubmit, setDisabledSubmit] = React.useState(true);
   const [showFormHelper, setShowFormHelper] = React.useState(false);
   const [helper, setHelper] = React.useState('');
-  const register = async (prop: tempRegi) => { console.log(prop); };
+  const [isLoading, setIsloading] = React.useState(false);
   const router = useRouter();
 
   React.useEffect(() => {
@@ -93,6 +88,7 @@ const RegisterForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsloading(true);
 
     if (disabledSubmit) {
       setShowFormHelper(true);
@@ -101,26 +97,33 @@ const RegisterForm = () => {
 
       console.log('submitted!');
 
-      const res = await register({
-        email:
+      const res = await poster<IRegisterResponse>(
+        `${env.api}/auth/register`,
+        {
+          email:
           findRequiredFieldValue('email'),
-        username:
+          username:
           findRequiredFieldValue('username'),
-        password:
+          password:
           findRequiredFieldValue('password'),
-        first_name:
+          first_name:
           findAdditionalFieldValue('firstName'),
-        last_name:
+          last_name:
           findAdditionalFieldValue('lastName'),
-        birthday:
+          birthday:
           birthdayField !== null ? format(birthdayField, 'yyyy-MM-dd') : null,
-      });
-      console.log(res);
+        },
+      );
 
-      router.push('/home');
-      setShowFormHelper(true);
-      setHelper('Internal error');
+      if (res.data?.ok) {
+        router.push('/confirmation');
+      } else {
+        setShowFormHelper(true);
+        setHelper('Internal error: please report the problem');
+      }
     }
+
+    setIsloading(false);
   };
   // --
 
@@ -227,14 +230,15 @@ const RegisterForm = () => {
             </Grid>
           )}
         </Grid>
-        <Button
+        <LoadingButton
+          loading={isLoading}
           type='submit'
           fullWidth
           variant='contained'
           sx={{ mt: 1, mb: 2 }}
         >
           Register
-        </Button>
+        </LoadingButton>
         <Grid container justifyContent='flex-end'>
           <Grid item>
             <Link href='/login' variant='body2'>

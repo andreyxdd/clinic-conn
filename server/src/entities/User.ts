@@ -1,5 +1,6 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column, BaseEntity, UpdateDateColumn, CreateDateColumn,
+  Entity, PrimaryGeneratedColumn, Column,
+  BaseEntity, UpdateDateColumn, CreateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'user' })
@@ -17,25 +18,25 @@ class User extends BaseEntity {
     password: string;
 
   @Column({ nullable: true })
-    first_name?: string;
+    firstName?: string;
 
   @Column({ nullable: true })
-    last_name?: string;
+    lastName?: string;
 
   @Column({ type: 'date', nullable: true })
     birthday?: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
-    created_at: Date;
+    createdAt: Date;
 
   @CreateDateColumn({ type: 'timestamp', nullable: true })
-    verified_at: Date;
+    verifiedAt: Date;
 
   @Column({ default: false })
-    is_verified: boolean;
+    isVerified: boolean;
 
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
-    updated_at: Date;
+    updatedAt: Date;
 
   @Column({ type: 'int', default: 0 })
     tokenVersion: number;

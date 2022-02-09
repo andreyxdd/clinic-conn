@@ -168,7 +168,7 @@ export async function validateName(
     return 'Special characters are not allowed';
   } if (maxInputLength.test(value)) {
     return 'This field can\'t be that long';
-  } if (numbers.test(value)) {
+  } if (!numbers.test(value)) {
     return 'Numbers are not allowed';
   }
   return '';

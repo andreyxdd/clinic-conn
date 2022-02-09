@@ -3,7 +3,7 @@ import React from 'react';
 import type { NextPage } from 'next';
 import { Typography } from '@mui/material';
 import Layout from '../layouts/Layout';
-import withUser from '../lib/api/SSR/getProps';
+import withUser from '../lib/api/ssr/getProps';
 import { useUser } from '../context/userContext';
 import { IUser } from '../config/types';
 

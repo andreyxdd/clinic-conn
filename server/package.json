@@ -4,9 +4,11 @@
    "description": "Awesome project developed with TypeORM.",
    "devDependencies": {
       "@types/bcryptjs": "^2.4.2",
+      "@types/compression": "^1.7.2",
       "@types/cookie-parser": "^1.4.2",
       "@types/cors": "^2.8.12",
       "@types/express": "^4.17.13",
+      "@types/hpp": "^0.2.2",
       "@types/jsonwebtoken": "^8.5.8",
       "@types/node": "^17.0.10",
       "@typescript-eslint/eslint-plugin": "^5.10.0",
@@ -21,14 +23,19 @@
    "dependencies": {
       "bcryptjs": "^2.4.3",
       "class-validator": "^0.13.2",
+      "compression": "^1.7.4",
       "cookie-parser": "^1.4.6",
       "cors": "^2.8.5",
       "dotenv": "^14.2.0",
       "express": "^4.17.2",
+      "express-rate-limit": "^6.2.0",
+      "helmet": "^5.0.2",
+      "hpp": "^0.2.3",
       "jsonwebtoken": "^8.5.1",
       "pg": "^8.4.0",
       "reflect-metadata": "^0.1.13",
-      "typeorm": "0.2.41"
+      "typeorm": "0.2.41",
+      "xss-clean": "^0.1.1"
    },
    "scripts": {
       "start": "nodemon --exec ts-node src/index.ts",

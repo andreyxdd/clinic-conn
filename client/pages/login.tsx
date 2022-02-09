@@ -6,12 +6,14 @@ import { useRouter } from 'next/router';
 import Layout from '../layouts/Layout';
 import SkeletonLoader from '../components/LoginForm/SkeletonLoader';
 import { IUser } from '../config/types';
-import withUser from '../lib/api/SSR/getProps';
+import withUser from '../lib/api/ssr/getProps';
 
 export const getServerSideProps = withUser();
 
-const LoginForm = dynamic(() => import('../components/LoginForm/LoginForm'),
-  { loading: () => <SkeletonLoader />, ssr: false });
+const LoginForm = dynamic(
+  () => import('../components/LoginForm/LoginForm'),
+  { loading: () => <SkeletonLoader />, ssr: false },
+);
 
 interface ILoginPageProps {
   user: IUser;
@@ -22,7 +24,7 @@ const Login: NextPage<ILoginPageProps> = ({ user }) => {
   React.useEffect(() => {
     if (user) {
       setTimeout(() => {
-        router.push('/home');
+        router.push('/hospitals');
       }, 6000);
     }
   }, [user]);

@@ -17,8 +17,9 @@ import { navigationPaths } from '../config/paths';
 import { IPathProps } from '../config/types';
 import { useUser } from '../context/userContext';
 // import { IPathProps, IUser } from '../config/types';
-// import env from '../lib/env';
-// import fetcher from '../lib/fetcher';
+import env from '../config/env';
+import { setAccessToken } from '../config/auth';
+import poster from '../lib/api/csr/poster';
 
 const AuthButton = styled(LoadingButton)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
@@ -39,20 +40,16 @@ const Navbar: React.FC<INavbarProps> = (
 ) => {
   const router = useRouter();
   const isMobile = useMediaQuery('(max-width:600px)');
-  // eslint-disable-next-line no-unused-vars
   const { user, setUser } = useUser();
 
-  // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleLogout = async () => {
     console.log('Logout!');
-    /*
-    await executeMutation();
+    await poster(`${env.api}/auth/logout`);
     setAccessToken('');
-    console.log('logoutData', logoutData);
-    router.push('/home');
-    */
+    setUser(null);
+    router.push('/');
   };
 
   const handleNavigationClick = (
@@ -125,7 +122,10 @@ const Navbar: React.FC<INavbarProps> = (
               ) : (
                 <AuthButton
                   loading={isLoading}
-                  onClick={() => { handleNavigationClick('/login'); }}
+                  onClick={() => {
+                    setIsLoading(true);
+                    handleNavigationClick('/login');
+                  }}
                   type='button'
                   variant='contained'
                 >

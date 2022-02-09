@@ -23,7 +23,7 @@ export default function withUser <T1>(
   async function getServerSideProps(context: any): Promise<GetServerSideProps<T1>> {
     // fetcher may work with other data interface
     async function fetcher<T2>(uri: string) { return (fetcherSSR<T2>(context.req, context.res, uri)); }
-    const { error, data: user } = await fetcher<IUser>(`${env.api}/user`);
+    const { error, data: user } = await fetcher<IUser>(`${env.api}/user/get`);
 
     if (redirect) {
       if (error || !user) {

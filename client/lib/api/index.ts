@@ -9,7 +9,7 @@ export const handleError = (error: AxiosError) => {
 
 export const refreshTokensCSR = async () => {
   const response = await axios.post(
-    `${env.api}/refresh_access_token`,
+    `${env.api}/auth/refresh_tokens`,
     undefined,
     { withCredentials: true },
   );

@@ -1,10 +1,15 @@
 import { CookieOptions } from 'express';
 
+require('dotenv').config();
+
 export const corsOptions = {
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token', 'Authorization'],
-  credentials: true, // this allows to send back (to client) cookies
+  allowedHeaders: [
+    'Origin', 'X-Requested-With', 'Content-Type',
+    'Accept', 'X-Access-Token', 'Authorization',
+  ],
+  credentials: true, // this allows to send cookies back (to client)
   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-  origin: 'http://localhost:3000',
+  origin: process.env.CLIENT_SIDE_URL,
   preflightContinue: false,
 };
 

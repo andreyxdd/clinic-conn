@@ -8,9 +8,9 @@ import { QueryResponse } from '../../../config/types';
 const SET_COOKIE_HEADER = 'set-cookie';
 
 const refreshTokensSSR = async (req: IncomingMessage, res: ServerResponse) => {
-  const response = await axios.post(
-    `${env.api}/refresh_access_token`,
-    undefined, {
+  const response = await axios.get(
+    `${env.api}/auth/refresh_tokens`,
+    {
       headers: { cookie: String(req.headers.cookie) },
     },
   );

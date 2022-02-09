@@ -1,6 +1,5 @@
 import React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -9,6 +8,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import { LoadingButton } from '@mui/lab';
 import env from '../../config/env';
 
 // custom
@@ -42,6 +42,7 @@ const LoginForm = () => {
   // -- submit button state
   const [disabledSubmit, setDisabledSubmit] = React.useState(true);
   const [showFormHelper, setShowFormHelper] = React.useState(false);
+  const [isLoading, setIsloading] = React.useState(false);
   const [helper, setHelper] = React.useState('');
   const router = useRouter();
 
@@ -55,36 +56,35 @@ const LoginForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsloading(true);
 
     if (disabledSubmit) {
       setShowFormHelper(true);
     } else {
       setShowFormHelper(false);
 
-      console.log('login form submitted!!');
-
-      const res = await axios.post(`${env.api}/login`,
+      const res = await axios.post(`${env.api}/auth/login`,
         {
           email: findRequiredFieldValue('email'),
           password: findRequiredFieldValue('password'),
         },
         { withCredentials: true });
 
-      console.log(res);
-
       if (res) {
         if (res.data.accessToken) {
           setAccessToken(res.data.accessToken);
           router.push('/home');
-        } else {
+        } if (res.data.message) {
           setShowFormHelper(true);
-          setHelper('Internal Server error');
+          setHelper(res.data.message);
         }
       } else {
         setShowFormHelper(true);
         setHelper('Internal Server error');
       }
     }
+
+    setIsloading(false);
   };
   // --
 
@@ -136,14 +136,15 @@ const LoginForm = () => {
             </Grid>
           )}
         </Grid>
-        <Button
+        <LoadingButton
+          loading={isLoading}
           type='submit'
           fullWidth
           variant='contained'
           sx={{ mt: 1, mb: 2 }}
         >
           Login
-        </Button>
+        </LoadingButton>
         <Grid container justifyContent='flex-end'>
           <Grid item>
             <Link href='/register' variant='body2'>

@@ -15,6 +15,12 @@ const SkeletonLoader = () => (
     <Skeleton sx={{ m: 2 }} variant='circular' width={60} height={60} />
     <Skeleton variant='rectangular' width={360} height={52} />
     <Skeleton variant='rectangular' width={360} height={52} />
+    <Skeleton variant='rectangular' width={360} height={52} />
+    <Skeleton variant='rectangular' width={360} height={52} />
+    <Skeleton sx={{ mt: 2 }} variant='rectangular' width={360} height={52} />
+    <Skeleton variant='rectangular' width={360} height={52} />
+    <Skeleton variant='rectangular' width={360} height={52} />
+    <Skeleton variant='rectangular' width={360} height={52} />
     <Skeleton sx={{ mt: 2, mb: 4 }} variant='rectangular' width={360} height={35} />
   </Stack>
 );
