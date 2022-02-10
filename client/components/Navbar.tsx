@@ -13,9 +13,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
+import shallow from 'zustand/shallow';
+import Link from 'next/link';
 import { navigationPaths } from '../config/paths';
 import { IPathProps } from '../config/types';
-import { useUser } from '../context/userContext';
+import { useStore } from '../context/storeZustand';
 // import { IPathProps, IUser } from '../config/types';
 import env from '../config/env';
 import { setAccessToken } from '../config/auth';
@@ -40,7 +42,15 @@ const Navbar: React.FC<INavbarProps> = (
 ) => {
   const router = useRouter();
   const isMobile = useMediaQuery('(max-width:600px)');
-  const { user, setUser } = useUser();
+  const {
+    user, setUser,
+  } = useStore(
+    (store) => ({
+      user: store.user,
+      setUser: store.setUser,
+    }),
+    shallow,
+  );
 
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -49,13 +59,7 @@ const Navbar: React.FC<INavbarProps> = (
     await poster(`${env.api}/auth/logout`);
     setAccessToken('');
     setUser(null);
-    router.push('/');
-  };
-
-  const handleNavigationClick = (
-    newPath: string,
-  ) => {
-    router.push(newPath);
+    router.push('/home');
   };
 
   const handleOpenDrawer = () => {
@@ -93,21 +97,21 @@ const Navbar: React.FC<INavbarProps> = (
             <>
               {
                 navigationPaths.map((item: IPathProps) => (
-                  <Button
-                    key={item.title}
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    variant={router.pathname === item.path ? 'outlined' : 'inherit'}
-                    color='inherit'
-                    onClick={() => { handleNavigationClick(item.path); }}
-                    type='button'
-                    style={{
-                      width: 150,
-                      marginRight: 30,
-                    }}
-                  >
-                    {item.title}
-                  </Button>
+                  <Link key={item.title} href={item.path} passHref>
+                    <Button
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      variant={router.pathname === item.path ? 'outlined' : 'inherit'}
+                      color='inherit'
+                      type='button'
+                      style={{
+                        width: 150,
+                        marginRight: 30,
+                      }}
+                    >
+                      {item.title}
+                    </Button>
+                  </Link>
                 ))
               }
               {user ? (
@@ -120,17 +124,18 @@ const Navbar: React.FC<INavbarProps> = (
                   Log Out
                 </AuthButton>
               ) : (
-                <AuthButton
-                  loading={isLoading}
-                  onClick={() => {
-                    setIsLoading(true);
-                    handleNavigationClick('/login');
-                  }}
-                  type='button'
-                  variant='contained'
-                >
-                  Sign In
-                </AuthButton>
+                <Link href='/login' passHref>
+                  <AuthButton
+                    loading={isLoading}
+                    onClick={() => {
+                      setIsLoading(true);
+                    }}
+                    type='button'
+                    variant='contained'
+                  >
+                    Sign In
+                  </AuthButton>
+                </Link>
               )}
             </>
           )}

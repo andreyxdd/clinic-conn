@@ -2,8 +2,8 @@ import React from 'react';
 import type { NextPage } from 'next';
 import { Typography, Button, Grid } from '@mui/material';
 import Link from 'next/link';
-import Layout from '../layouts/Layout';
-import useUserRedirect from '../customHooks/useRedirect';
+import useUserRedirect from '../customHooks/useUserRedirect';
+import useNoLayoutPage from '../customHooks/useNoLayoutPage';
 
 /**
  * This is the landing page.
@@ -11,12 +11,10 @@ import useUserRedirect from '../customHooks/useRedirect';
  */
 const Landing: NextPage = (): JSX.Element => {
   const user = useUserRedirect({ after: 1, where: '/hospitals' });
+  useNoLayoutPage();
+
   return (
-    <Layout
-      showNavbar={false}
-      showTransition={false}
-      maxWidth='xs'
-    >
+    <>
       <Grid
         container
         spacing={2}
@@ -44,7 +42,7 @@ const Landing: NextPage = (): JSX.Element => {
           </Link>
         </Grid>
       </Grid>
-    </Layout>
+    </>
   );
 };
 

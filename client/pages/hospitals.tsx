@@ -1,23 +1,19 @@
 /* eslint-disable max-len */
 import React from 'react';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import { Typography, Button, Grid } from '@mui/material';
-import Layout from '../layouts/Layout';
+import Link from 'next/link';
+import useLayoutPage from '../customHooks/useLayoutPage';
 
 /**
  * This is the landing page.
  * @return {JSX.Element}
  */
 const Hospitals: NextPage = (): JSX.Element => {
-  const router = useRouter();
-  const [showTransition, setShowTransition] = React.useState(false);
-  const handleClick = (newPath: string) => {
-    setShowTransition(true);
-    router.push(newPath);
-  };
+  useLayoutPage();
+
   return (
-    <Layout showNavbar maxWidth='xl' showTransition={showTransition}>
+    <>
       <Typography variant='h4' sx={{ mb: 6 }}>
         Infromation for Hospitals
       </Typography>
@@ -46,17 +42,18 @@ const Hospitals: NextPage = (): JSX.Element => {
             </Button>
           </Grid>
           <Grid item xs={6} container justifyContent='center'>
-            <Button
-              onClick={() => { handleClick('/login'); }}
-              variant='outlined'
-              type='button'
-            >
-              Procced to login page
-            </Button>
+            <Link href='/login' passHref>
+              <Button
+                variant='outlined'
+                type='button'
+              >
+                Procced to login page
+              </Button>
+            </Link>
           </Grid>
         </Grid>
       </div>
-    </Layout>
+    </>
   );
 };
 

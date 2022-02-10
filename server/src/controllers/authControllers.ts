@@ -35,7 +35,12 @@ export const login = async (req: Request, res: Response) => {
 
     return res.status(200).send({
       accessToken: createAccessToken(user!),
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
+
     });
   } catch (e) {
     return res.status(500).send({ message: e.message });
@@ -43,9 +48,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const logout = async (_: Request, res: Response) => {
-  console.log('logout?');
   attachRefreshToken(res, '');
-  console.log('logout?2');
   return res.status(200).send();
 };
 
@@ -112,7 +115,11 @@ export const refreshTokens = async (req: Request, res: Response) => {
 
     return res.status(200).send({
       accessToken: createAccessToken(user!),
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
     });
   } catch (e) {
     attachRefreshToken(res, '');

@@ -1,24 +1,30 @@
 import React from 'react';
 import { Breakpoint, Container } from '@mui/material';
+import shallow from 'zustand/shallow';
 import Navbar from '../components/Navbar';
 import TransitionLoader from '../components/TransitionLoader';
 import Copyright from '../components/Copyright';
 import MobileDrawer from '../components/MobileDrawer';
+import { useStore } from '../context/storeZustand';
 
 interface ILayoutProps {
   children: React.ReactNode;
-  showNavbar: boolean;
-  showTransition: boolean;
-  maxWidth: string;
 }
 
-const Layout: React.FC<ILayoutProps> = ({
-  children,
-  showNavbar,
-  showTransition,
-  maxWidth,
-}) => {
+const Layout: React.FC<ILayoutProps> = ({ children }) => {
   const [openMobileDrawer, setOpenMobileDrawer] = React.useState(false);
+
+  const showTransition = false;
+
+  const {
+    containerMaxWidth, showNavbar,
+  } = useStore(
+    (store) => ({
+      containerMaxWidth: store.containerMaxWidth,
+      showNavbar: store.showNavbar,
+    }),
+    shallow,
+  );
 
   return (
     <div>
@@ -31,7 +37,7 @@ const Layout: React.FC<ILayoutProps> = ({
       {showTransition && <TransitionLoader />}
       <Container
         component='main'
-        maxWidth={maxWidth as Breakpoint}
+        maxWidth={containerMaxWidth as Breakpoint}
         onClick={() => {
           if (openMobileDrawer) {
             setOpenMobileDrawer(false);

@@ -1,17 +1,27 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import type { NextPage } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import Grid from '@mui/material/Grid';
+import { useRouter } from 'next/router';
+import useNoLayoutPage from '../customHooks/useNoLayoutPage';
 
-const Notfound = () => {
+export async function getStaticProps() {
+  return {
+    props: {},
+  };
+}
+
+// eslint-disable-next-line no-unused-vars
+const Notfound: NextPage = (props) => {
   const router = useRouter();
 
-  useEffect(() => {
+  React.useEffect(() => {
     setTimeout(() => {
       router.push('/home');
     }, 6000);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useNoLayoutPage('xl');
 
   // purple x moss 2020
   return (
@@ -56,8 +66,15 @@ const Notfound = () => {
       <style jsx>
         {`
           .wrapper {
-            min-height: 100vh;
-            width: 100%;
+            position: relative;
+            width: 100vw;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            height: 100vh;
+            margin-top: -100px;
+            margin-bottom: -100px;
             background-color: #42a5f5;
             display: -ms-flexbox;
             display: -webkit-flex;
@@ -66,7 +83,6 @@ const Notfound = () => {
             -webkit-align-items: center;
             -webkit-box-align: center;
             align-items: center;
-            padding-top: 0
           }
 
           .err {

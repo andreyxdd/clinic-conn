@@ -9,11 +9,15 @@ import { CacheProvider, EmotionCache } from '@emotion/react';
 import theme from '../styles/theme';
 import createEmotionCache from '../lib/emotion/createEmotionCache';
 import '../styles/globals.css';
+import { useCreateStore, Provider } from '../context/storeZustand';
+import Layout from '../layouts/Layout';
+/*
 import { UserProvider } from '../context/userContext';
 import { IUser } from '../config/types';
 import fetcher from '../lib/api/csr/fetcher';
 import env from '../config/env';
 import useSessionStorage from '../customHooks/useSessionStorage';
+*/
 
 // Client-side cache, shared for the whole session of the user in the browser
 const clientSideEmotionCache = createEmotionCache();
@@ -21,7 +25,7 @@ interface IAppProps extends AppProps {
   // eslint-disable-next-line react/require-default-props
   emotionCache?: EmotionCache;
   // eslint-disable-next-line react/require-default-props
-  userCache?: IUser;
+  // userCache?: IUser;
 }
 
 const App = (props: IAppProps) => {
@@ -29,25 +33,10 @@ const App = (props: IAppProps) => {
     Component, emotionCache = clientSideEmotionCache, pageProps,
   } = props;
 
-  const [user, setUser] = useSessionStorage<IUser | null>('user');
-
-  React.useEffect(() => {
-    const getUser = async () => {
-      const { error, data } = await fetcher<IUser>(`${env.api}/user/get`);
-      if (!error && data) {
-        console.log('before set user', user);
-        setUser(data);
-        console.log('after set user', user);
-      } else {
-        setUser(null);
-      }
-    };
-
-    if (!user) getUser();
-  }, []);
+  const createStore = useCreateStore(pageProps?.initialZustandState);
 
   return (
-    <UserProvider initialContext={{ user, setUser }}>
+    <Provider createStore={createStore}>
       <CacheProvider value={emotionCache}>
         <Head>
           <title>WorldMedExpo</title>
@@ -60,10 +49,12 @@ const App = (props: IAppProps) => {
         </Head>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </ThemeProvider>
       </CacheProvider>
-    </UserProvider>
+    </Provider>
   );
 };
 

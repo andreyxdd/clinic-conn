@@ -2,7 +2,6 @@ import React from 'react';
 import type { NextPage } from 'next';
 import { Typography, Button, Grid } from '@mui/material';
 import Link from 'next/link';
-import Layout from '../layouts/Layout';
 
 export async function getStaticProps() {
   return {
@@ -16,11 +15,7 @@ export async function getStaticProps() {
  */
 // eslint-disable-next-line no-unused-vars
 const Landing: NextPage = (props): JSX.Element => (
-  <Layout
-    showNavbar={false}
-    showTransition={false}
-    maxWidth='xs'
-  >
+  <>
     <Grid
       container
       spacing={2}
@@ -50,7 +45,7 @@ const Landing: NextPage = (props): JSX.Element => (
         </Link>
       </Grid>
     </Grid>
-  </Layout>
+  </>
 );
 
 export default Landing;

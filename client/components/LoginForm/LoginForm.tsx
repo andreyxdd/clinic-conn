@@ -17,6 +17,7 @@ import requiredFields from './formFields';
 
 // auth
 import { setAccessToken } from '../../config/auth';
+import { useStore } from '../../context/storeZustand';
 
 const LoginForm = () => {
   // -- required fields
@@ -45,6 +46,7 @@ const LoginForm = () => {
   const [isLoading, setIsloading] = React.useState(false);
   const [helper, setHelper] = React.useState('');
   const router = useRouter();
+  const setUser = useStore((state) => state.setUser);
 
   React.useEffect(() => {
     if (disabledSubmit) {
@@ -73,6 +75,7 @@ const LoginForm = () => {
       if (res) {
         if (res.data.accessToken) {
           setAccessToken(res.data.accessToken);
+          setUser(res.data.user);
           router.push('/home');
         } if (res.data.message) {
           setShowFormHelper(true);

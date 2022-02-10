@@ -1,38 +1,23 @@
 import React from 'react';
-import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import Typography from '@mui/material/Typography';
-import Layout from '../layouts/Layout';
 import SkeletonLoader from '../components/RegisterForm/SkeletonLoader';
-import { IUser } from '../config/types';
-import withUser from '../lib/api/ssr/getProps';
-
-export const getServerSideProps = withUser();
+import useUserRedirect from '../customHooks/useUserRedirect';
+import useNoLayoutPage from '../customHooks/useNoLayoutPage';
 
 const RegisterForm = dynamic(
   () => import('../components/RegisterForm/RegisterForm'),
   { loading: () => <SkeletonLoader />, ssr: false },
 );
-interface IRegisterProps {
-  user: IUser;
-}
+interface IRegisterProps {}
 
-const Register: React.FC<IRegisterProps> = ({ user }) => {
-  const router = useRouter();
-  React.useEffect(() => {
-    if (user) {
-      setTimeout(() => {
-        router.push('/hospitals');
-      }, 6000);
-    }
-  }, [user]);
+const Register: React.FC<IRegisterProps> = () => {
+  const isUser = useUserRedirect({ after: 6, where: '/home' });
+  useNoLayoutPage();
+
   return (
-    <Layout
-      showNavbar={false}
-      showTransition={false}
-      maxWidth='xs'
-    >
-      {!user ? (
+    <>
+      {!isUser ? (
         <RegisterForm />
       ) : (
         <Typography
@@ -48,8 +33,7 @@ const Register: React.FC<IRegisterProps> = ({ user }) => {
           You are already registered
         </Typography>
       )}
-
-    </Layout>
+    </>
   );
 };
 
