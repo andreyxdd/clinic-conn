@@ -3,11 +3,13 @@ import { Request, Response } from 'express';
 import { compare, hash } from 'bcryptjs';
 import { verify } from 'jsonwebtoken';
 import User from '../entities/User';
+import UserVerification from '../entities/UserVerification';
 import {
   createAccessToken, createRefreshToken,
-  attachRefreshToken, revokeRefreshTokensForUser,
+  attachRefreshToken, revokeRefreshTokensForUser, createConfirmationToken,
 } from '../utils/authUtils';
 import { timeToUpdateRefreshToken } from '../config/index';
+import { sendConfirmation } from '../utils/emailUtils';
 
 //--
 
@@ -28,6 +30,12 @@ export const login = async (req: Request, res: Response) => {
     if (!valid) {
       return res.send({
         message: 'Inalid password provided',
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.send({
+        message: 'Your account is not confirmed',
       });
     }
 
@@ -63,7 +71,8 @@ export const register = async (req: Request, res: Response) => {
       birthday,
     } = req.body;
 
-    await User.insert({
+    // inserting new user
+    const { identifiers } = await User.insert({
       username,
       email,
       password: await hash(password, 12),
@@ -71,6 +80,22 @@ export const register = async (req: Request, res: Response) => {
       lastName,
       birthday,
     });
+    const { id } = identifiers[0];
+
+    // creating verification token
+    const emailToken = createConfirmationToken(id);
+
+    // inserting new user verification record
+    UserVerification.insert({
+      userId: id,
+      emailToken,
+    });
+
+    // generating confirmation link
+    const confirmationLink = `http://${req.headers.host}/api/auth/confirmation/${emailToken}`;
+
+    // emaling user
+    sendConfirmation(email, username, confirmationLink);
 
     return res.status(200).send({ ok: true });
   } catch (e) {
@@ -87,7 +112,6 @@ export const refreshTokens = async (req: Request, res: Response) => {
     }
 
     let refreshPayload: any = null;
-
     refreshPayload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
 
     // refresh token is valid
@@ -144,14 +168,13 @@ export const revokeRefreshToken = async (_: Request, res: Response) => {
 
 export const checkUsername = async (req: Request, res: Response) => {
   const existingUsername = await User.findOne({
-    where: { username: req.body.username },
+    where: { username: req.query.username },
   });
 
   if (existingUsername) {
     return res.status(200).send({
       ok: false,
       error: 'Account with the same username already exists',
-      field: 'username',
     });
   }
   return res.status(200).send({ ok: true });
@@ -159,15 +182,29 @@ export const checkUsername = async (req: Request, res: Response) => {
 
 export const checkEmail = async (req: Request, res: Response) => {
   const existingEmail = await User.findOne({
-    where: { email: req.body.email },
+    where: { email: req.query.email },
   });
 
   if (existingEmail) {
     return res.status(200).send({
       ok: false,
       error: 'Account with the same email already exists',
-      field: 'email',
     });
   }
   return res.status(200).send({ ok: true });
+};
+
+export const confirmEmail = async (req: Request, res: Response) => {
+  try {
+    let payload: any = null;
+    payload = verify(req.params.token, process.env.EMAIL_TOKEN_SECRET!);
+    await User.update(
+      { id: payload.userId },
+      { isVerified: true },
+    );
+  } catch (error) {
+    res.status(400).send({ error });
+  }
+
+  return res.redirect(`${process.env.CLIENT_SIDE_URL}/login`);
 };

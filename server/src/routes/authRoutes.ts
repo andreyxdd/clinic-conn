@@ -3,6 +3,7 @@ import { authMiddleware } from '../utils/authUtils';
 import {
   login, logout, register, refreshTokens,
   revokeRefreshToken, checkEmail, checkUsername,
+  confirmEmail,
 } from '../controllers/authControllers';
 
 const router = Router();
@@ -15,6 +16,7 @@ router.get('/refresh_tokens', refreshTokens);
 router.get('/check_email', checkEmail);
 router.get('/check_email', checkEmail);
 router.get('/check_username', checkUsername);
+router.get('/confirmation/:token', confirmEmail);
 
 // -- below routes only for authorized users
 router.use(authMiddleware);

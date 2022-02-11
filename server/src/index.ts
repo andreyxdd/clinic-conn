@@ -1,6 +1,7 @@
 /* eslint-disable import/no-named-default */
 import 'reflect-metadata';
 import express from 'express';
+// import { createServer } from 'http';
 import { createConnection } from 'typeorm';
 import coockieParser from 'cookie-parser';
 import cors from 'cors';
@@ -22,6 +23,9 @@ require('dotenv').config();
 (async () => {
   const PORT = process.env.PORT || 4000;
   const app = express();
+
+  // needed later for socket.io:
+  // const httpServer = createServer(app);
 
   // -- Global Middlewares:
   // Enable CORS (Access-Control-Allow-Origin: only from the client!)
@@ -70,7 +74,7 @@ require('dotenv').config();
     res.send(`API version ${v}`);
   });
 
-  // endpoint for the tests
+  // endpoints for the tests
   app.get('/users', async (_, res) => {
     const users = await User.find({ select: ['username', 'email', 'id'] });
     res.send(users);

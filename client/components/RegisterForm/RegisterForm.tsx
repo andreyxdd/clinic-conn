@@ -162,6 +162,7 @@ const RegisterForm = () => {
               valueToConfirm={
                 findRequiredFieldValue('password')
               }
+              checkInDB={field.checkInDB}
               setDisabledSubmit={setDisabledSubmit}
               key={field.label}
             />

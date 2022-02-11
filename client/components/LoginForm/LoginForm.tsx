@@ -120,11 +120,7 @@ const LoginForm = () => {
               value={requiredForm[idx].value}
               halfWidth={field.halfWidth}
               validator={field.validator}
-              valueToConfirm={
-                requiredForm[
-                  requiredForm.findIndex(({ id }) => id === 'password')
-                ].value
-              }
+              checkInDB={field.checkInDB}
               setDisabledSubmit={setDisabledSubmit}
               key={field.label}
             />

@@ -1,7 +1,8 @@
 import {
   Entity, PrimaryGeneratedColumn, Column,
-  BaseEntity, UpdateDateColumn, CreateDateColumn,
+  BaseEntity, UpdateDateColumn, CreateDateColumn, OneToMany,
 } from 'typeorm';
+import UserVerification from './UserVerification';
 
 @Entity({ name: 'user' })
 class User extends BaseEntity {
@@ -40,6 +41,9 @@ class User extends BaseEntity {
 
   @Column({ type: 'int', default: 0 })
     tokenVersion: number;
+
+  @OneToMany(() => UserVerification, (userVerification) => userVerification.user)
+    userVerifications: UserVerification[];
 }
 
 export default User;

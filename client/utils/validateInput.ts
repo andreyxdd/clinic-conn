@@ -4,6 +4,9 @@
  * were detected the empty string is returned.
  */
 
+import axios from 'axios';
+import env from '../config/env';
+
 // -- Regex:
 const validEmail = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const maxInputLength = /^.{200,}$/;
@@ -27,77 +30,29 @@ export interface IValidatorProps{
 
 // method to check if the same email existed in db
 async function checkEmail(emailToCheck: string): Promise<ICheckFieldProps> {
-  const data = JSON.stringify({
-    query:
-    `query EmailCheckQuery($email: String!){
-      emailCheck(email: $email){
-        ok
-        error
-      }
-    }`,
-    variables:
-    `{
-      "email": "${emailToCheck}"
-    }`,
-  });
-
   try {
-    const response = await fetch(
-      'http://localhost:4000/graphql',
-      {
-        method: 'post',
-        body: data,
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': `${data.length}`,
-        },
-      },
-    );
+    const res = await axios.get(`${env.api}/auth/check_email`, {
+      params: { email: emailToCheck },
+    });
 
-    const json = await response.json();
-
-    return json.data.emailCheck;
+    return res.data;
   } catch (e) {
-    console.log('%cvalidateInput.tsx line:50 e', 'color: #007acc;', e);
+    console.log('%cvalidateInput.tsx line:40 e', 'color: #007acc;', e);
   }
 
   return { ok: false, error: 'Internal Client Error' };
 }
 
 // method to check if the same username existed in db
-async function checkUsername(usernameToCheck: string): Promise<ICheckFieldProps> {
-  const data = JSON.stringify({
-    query:
-    `query UsernameCheckQuery($username: String!){
-      usernameCheck(username: $username){
-        ok
-        error
-      }
-    }`,
-    variables:
-    `{
-      "username": "${usernameToCheck}"
-    }`,
-  });
-
+async function checkUsername(usernameToCheck: string):Promise<ICheckFieldProps> {
   try {
-    const response = await fetch(
-      'http://localhost:4000/graphql',
-      {
-        method: 'post',
-        body: data,
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': `${data.length}`,
-        },
-      },
-    );
+    const res = await axios.get(`${env.api}/auth/check_username`, {
+      params: { username: usernameToCheck },
+    });
 
-    const json = await response.json();
-
-    return json.data.usernameCheck;
+    return res.data;
   } catch (e) {
-    console.log('%cvalidateInput.tsx line:93 e', 'color: #007acc;', e);
+    console.log('%cvalidateInput.tsx line:55 e', 'color: #007acc;', e);
   }
 
   return { ok: false, error: 'Internal Client Error' };

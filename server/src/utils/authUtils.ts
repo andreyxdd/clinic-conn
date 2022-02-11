@@ -8,6 +8,8 @@ export const createAccessToken = (user: User) => sign({ userId: user.id }, proce
 
 export const createRefreshToken = (user: User) => sign({ userId: user.id, tokenVersion: user.tokenVersion }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
 
+export const createConfirmationToken = (userId: string) => sign({ userId }, process.env.EMAIL_TOKEN_SECRET!, { expiresIn: '1d' });
+
 export const attachRefreshToken = (res: Response, refreshToken: string) => {
   res.cookie('jid', refreshToken, {
     ...cookiesOptions,
