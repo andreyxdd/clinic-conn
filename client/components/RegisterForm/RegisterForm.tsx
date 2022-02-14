@@ -17,17 +17,11 @@ import TextField from '@mui/material/TextField';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 import { LoadingButton } from '@mui/lab';
-import poster from '../../lib/api/csr/poster';
-import env from '../../config/env';
 
 // custom
 import Input, { IInputProps } from '../Input';
 import { requiredFields, additionalFields } from './formFields';
-
-interface IRegisterResponse{
-  ok: boolean;
-  error?: string;
-}
+import useAuth from '../../customHooks/useAuth';
 
 const RegisterForm = () => {
   // -- required fields
@@ -77,6 +71,7 @@ const RegisterForm = () => {
   const [helper, setHelper] = React.useState('');
   const [isLoading, setIsloading] = React.useState(false);
   const router = useRouter();
+  const { register } = useAuth();
 
   React.useEffect(() => {
     if (disabledSubmit) {
@@ -97,8 +92,7 @@ const RegisterForm = () => {
 
       console.log('submitted!');
 
-      const res = await poster<IRegisterResponse>(
-        `${env.api}/auth/register`,
+      const res = await register(
         {
           email:
           findRequiredFieldValue('email'),
@@ -106,20 +100,20 @@ const RegisterForm = () => {
           findRequiredFieldValue('username'),
           password:
           findRequiredFieldValue('password'),
-          first_name:
+          firstName:
           findAdditionalFieldValue('firstName'),
-          last_name:
+          lastName:
           findAdditionalFieldValue('lastName'),
           birthday:
           birthdayField !== null ? format(birthdayField, 'yyyy-MM-dd') : null,
         },
       );
 
-      if (res.data?.ok) {
-        router.push('/confirmation');
-      } else {
+      if (!res.ok && res.message) {
         setShowFormHelper(true);
-        setHelper('Internal error: please report the problem');
+        setHelper(res.message);
+      } else {
+        router.push('/confirmation');
       }
     }
 

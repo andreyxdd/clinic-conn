@@ -3,14 +3,14 @@ import React from 'react';
 import type { NextPage } from 'next';
 import { Typography, Button, Grid } from '@mui/material';
 import Link from 'next/link';
-import useLayoutPage from '../customHooks/useLayoutPage';
+import useLayout from '../customHooks/useLayout';
 
 /**
  * This is the landing page.
  * @return {JSX.Element}
  */
 const Hospitals: NextPage = (): JSX.Element => {
-  useLayoutPage();
+  useLayout({ showNavbar: true, showTransition: false, containerMaxWidth: 'xl' });
 
   return (
     <>

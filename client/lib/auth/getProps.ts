@@ -1,12 +1,12 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { IUser, QueryResponse } from '../../../config/types';
-import env from '../../../config/env';
-import fetcherSSR from './fetcherSSR';
+import { IUser, QueryResponse } from '../../config/types';
+import env from '../../config/env';
+import { fetcher } from './ssr';
 
 interface IGetProps {
   context: GetServerSidePropsContext;
   // eslint-disable-next-line no-unused-vars
-  fetcher: <T>(uri: string) => Promise<QueryResponse<T>>;
+  fetcherInstance: <T>(uri: string) => Promise<QueryResponse<T>>;
   user: IUser | null;
 }
 
@@ -22,8 +22,8 @@ export default function withUser <T1>(
 ) {
   async function getServerSideProps(context: any): Promise<GetServerSideProps<T1>> {
     // fetcher may work with other data interface
-    async function fetcher<T2>(uri: string) { return (fetcherSSR<T2>(context.req, context.res, uri)); }
-    const { error, data: user } = await fetcher<IUser>(`${env.api}/user/get`);
+    async function fetcherInstance<T2>(uri: string) { return (fetcher<T2>(context.req, context.res, uri)); }
+    const { error, data: user } = await fetcherInstance<IUser>(`${env.api}/user/get`);
 
     if (redirect) {
       if (error || !user) {
@@ -39,7 +39,7 @@ export default function withUser <T1>(
     }
 
     const result = getProps
-      ? await getProps({ context, fetcher, user })
+      ? await getProps({ context, fetcherInstance, user })
       : {};
     const props = (result as any).props || {};
 

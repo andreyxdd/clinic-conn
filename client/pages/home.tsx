@@ -2,11 +2,7 @@
 import React from 'react';
 import type { NextPage } from 'next';
 import { Typography } from '@mui/material';
-import shallow from 'zustand/shallow';
-import { useStore } from '../context/storeZustand';
-import { IUser } from '../config/types';
-import fetcher from '../lib/api/csr/fetcher';
-import env from '../config/env';
+import useLayout from '../customHooks/useLayout';
 
 interface IHomePageProps { }
 
@@ -15,35 +11,7 @@ interface IHomePageProps { }
  * @return {JSX.Element}
  */
 const Home: NextPage<IHomePageProps> = (): JSX.Element => {
-  const {
-    user, setUser, setContainerMaxWidth, setShowNavbar,
-  } = useStore(
-    (store) => ({
-      user: store.user,
-      setUser: store.setUser,
-      setContainerMaxWidth: store.setContainerMaxWidth,
-      setShowNavbar: store.setShowNavbar,
-    }),
-    shallow,
-  );
-
-  React.useEffect(() => {
-    const getUser = async () => {
-      const { error, data } = await fetcher<IUser>(`${env.api}/user/get`);
-      if (!error && data) {
-        console.log('before set user', user);
-        setUser(data);
-        console.log('after set user', user);
-      } else {
-        setUser(null);
-      }
-    };
-
-    if (!user) getUser();
-
-    setContainerMaxWidth('xl');
-    setShowNavbar(true);
-  }, []);
+  useLayout({ showNavbar: true, showTransition: false, containerMaxWidth: 'xl' });
 
   return (
     <>

@@ -2,16 +2,16 @@ import React from 'react';
 import type { NextPage } from 'next';
 import { Typography, Button, Grid } from '@mui/material';
 import Link from 'next/link';
-import useUserRedirect from '../customHooks/useUserRedirect';
-import useNoLayoutPage from '../customHooks/useNoLayoutPage';
+import useRedirect from '../customHooks/useRedirect';
+import useLayout from '../customHooks/useLayout';
 
 /**
  * This is the landing page.
  * @return {JSX.Element}
  */
 const Landing: NextPage = (): JSX.Element => {
-  const isUser = useUserRedirect({ after: 6, where: '/home' });
-  useNoLayoutPage('xl');
+  useLayout();
+  const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
 
   return (
     <>

@@ -6,18 +6,13 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import axios from 'axios';
 import { useRouter } from 'next/router';
 import { LoadingButton } from '@mui/lab';
-import env from '../../config/env';
+import useAuth from '../../customHooks/useAuth';
 
 // custom
 import Input, { IInputProps } from '../Input';
 import requiredFields from './formFields';
-
-// auth
-import { setAccessToken } from '../../config/auth';
-import { useStore } from '../../context/storeZustand';
 
 const LoginForm = () => {
   // -- required fields
@@ -32,7 +27,7 @@ const LoginForm = () => {
     setRequiredForm(newForm);
   };
 
-  const findRequiredFieldValue = (idToFind: string) => (
+  const getRequiredFieldValue = (idToFind: string) => (
     requiredForm[
       requiredForm.findIndex(({ id }) => id === idToFind)
     ].value
@@ -46,7 +41,7 @@ const LoginForm = () => {
   const [isLoading, setIsloading] = React.useState(false);
   const [helper, setHelper] = React.useState('');
   const router = useRouter();
-  const setUser = useStore((state) => state.setUser);
+  const { login } = useAuth();
 
   React.useEffect(() => {
     if (disabledSubmit) {
@@ -65,25 +60,18 @@ const LoginForm = () => {
     } else {
       setShowFormHelper(false);
 
-      const res = await axios.post(`${env.api}/auth/login`,
-        {
-          email: findRequiredFieldValue('email'),
-          password: findRequiredFieldValue('password'),
-        },
-        { withCredentials: true });
+      const res = await login({
+        email: getRequiredFieldValue('email'),
+        password: getRequiredFieldValue('password'),
+      });
 
-      if (res) {
-        if (res.data.accessToken) {
-          setAccessToken(res.data.accessToken);
-          setUser(res.data.user);
-          router.push('/home');
-        } if (res.data.message) {
-          setShowFormHelper(true);
-          setHelper(res.data.message);
-        }
+      if (res.ok) {
+        // TODO: toast('successfull log in');
+        router.push('/home');
       } else {
+        // TODO: consider using toasts instead
         setShowFormHelper(true);
-        setHelper('Internal Server error');
+        setHelper(res.message!);
       }
     }
 

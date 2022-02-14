@@ -1,7 +1,8 @@
 /* eslint-disable import/no-named-default */
 import 'reflect-metadata';
 import express from 'express';
-// import { createServer } from 'http';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { createConnection } from 'typeorm';
 import coockieParser from 'cookie-parser';
 import cors from 'cors';
@@ -11,12 +12,16 @@ import hpp from 'hpp';
 import { rateLimit } from 'express-rate-limit';
 import compression from 'compression';
 import { version as v } from '../package.json';
+import logger from './utils/logUtils';
 
 // Routing
 import { default as authRouter } from './routes/authRoutes';
 import { default as userRouter } from './routes/userRoutes';
 import { corsOptions } from './config/index';
 import User from './entities/User';
+
+// Sockets
+import videoSocket from './videoSocket';
 
 require('dotenv').config();
 
@@ -25,7 +30,16 @@ require('dotenv').config();
   const app = express();
 
   // needed later for socket.io:
-  // const httpServer = createServer(app);
+  const httpServer = createServer(app);
+
+  // initiate socket connection
+  const io = new Server(httpServer, {
+    cors: {
+      origin: process.env.CLIENT_SIDE_URL!,
+      credentials: true,
+      methods: ['GET', 'POST'],
+    },
+  });
 
   // -- Global Middlewares:
   // Enable CORS (Access-Control-Allow-Origin: only from the client!)
@@ -91,8 +105,10 @@ require('dotenv').config();
   // --
 
   // -- listening
-  app.listen(PORT, () => {
-    console.log(`Server running on port: ${PORT}`);
+  httpServer.listen(PORT, () => {
+    logger.info(`Server running on port: ${PORT}`);
+
+    videoSocket({ io });
   });
   //--
 })();

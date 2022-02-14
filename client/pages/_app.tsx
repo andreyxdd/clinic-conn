@@ -9,7 +9,8 @@ import { CacheProvider, EmotionCache } from '@emotion/react';
 import theme from '../styles/theme';
 import createEmotionCache from '../lib/emotion/createEmotionCache';
 import '../styles/globals.css';
-import { useCreateStore, Provider } from '../context/storeZustand';
+import { useCreateUIStore, UIProvider } from '../context/UIStore';
+import { useCreateAuthStore, AuthProvider } from '../context/AuthStore';
 import Layout from '../layouts/Layout';
 /*
 import { UserProvider } from '../context/userContext';
@@ -33,28 +34,33 @@ const App = (props: IAppProps) => {
     Component, emotionCache = clientSideEmotionCache, pageProps,
   } = props;
 
-  const createStore = useCreateStore(pageProps?.initialZustandState);
+  const createStore = useCreateUIStore(pageProps?.initialZustandState);
+  const createAuthStore = useCreateAuthStore(pageProps?.initialZustandState);
 
+  // Provider is for common UI states (Zustand)
+  // AuthProvider is for user state (Context API)
   return (
-    <Provider createStore={createStore}>
-      <CacheProvider value={emotionCache}>
-        <Head>
-          <title>WorldMedExpo</title>
-          {/*
+    <UIProvider createStore={createStore}>
+      <AuthProvider createStore={createAuthStore}>
+        <CacheProvider value={emotionCache}>
+          <Head>
+            <title>WorldMedExpo</title>
+            {/*
           <link
             rel='icon'
             href='https://img.icons8.com/color/48/000000/diamond.png'
           /> */}
-          <meta name='viewport' content='initial-scale=1, width=device-width' />
-        </Head>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ThemeProvider>
-      </CacheProvider>
-    </Provider>
+            <meta name='viewport' content='initial-scale=1, width=device-width' />
+          </Head>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ThemeProvider>
+        </CacheProvider>
+      </AuthProvider>
+    </UIProvider>
   );
 };
 

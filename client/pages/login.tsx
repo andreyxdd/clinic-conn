@@ -3,8 +3,8 @@ import { NextPage } from 'next';
 import Typography from '@mui/material/Typography';
 import dynamic from 'next/dynamic';
 import SkeletonLoader from '../components/LoginForm/SkeletonLoader';
-import useUserRedirect from '../customHooks/useUserRedirect';
-import useNoLayoutPage from '../customHooks/useNoLayoutPage';
+import useRedirect from '../customHooks/useRedirect';
+import useLayout from '../customHooks/useLayout';
 
 const LoginForm = dynamic(
   () => import('../components/LoginForm/LoginForm'),
@@ -14,8 +14,8 @@ const LoginForm = dynamic(
 interface ILoginPageProps {}
 
 const Login: NextPage<ILoginPageProps> = () => {
-  const isUser = useUserRedirect({ after: 6, where: '/home' });
-  useNoLayoutPage();
+  const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
+  useLayout({ showNavbar: false, showTransition: false, containerMaxWidth: 'xs' });
 
   return (
     <>

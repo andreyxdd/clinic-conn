@@ -20,24 +20,26 @@ export const login = async (req: Request, res: Response) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.send({
-        message: 'User with provided email not found',
+      return res.status(403).send({
+        field: 'email',
       });
     }
 
     const valid = await compare(password as string, user!.password);
 
     if (!valid) {
-      return res.send({
-        message: 'Inalid password provided',
+      return res.status(403).send({
+        field: 'password',
       });
     }
 
+    /* TODO: UNCOMMMENT IN RPODUCTION
     if (!user.isVerified) {
       return res.send({
-        message: 'Your account is not confirmed',
+      field: 'isVerified'
       });
     }
+    */
 
     attachRefreshToken(res, createRefreshToken(user!));
 
@@ -56,8 +58,20 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const logout = async (_: Request, res: Response) => {
+  const id = res.locals.payload.userId; // from middleware
+  const user = await User.findOne({ where: { id } });
+
+  if (!user) {
+    return res.status(404).send({
+      message: 'User with given Id not found',
+    });
+  }
+
   attachRefreshToken(res, '');
-  return res.status(200).send();
+
+  const revokedStatus = await revokeRefreshTokensForUser(user!);
+
+  return res.status(revokedStatus ? 200 : 500);
 };
 
 export const register = async (req: Request, res: Response) => {
@@ -97,9 +111,9 @@ export const register = async (req: Request, res: Response) => {
     // emaling user
     sendConfirmation(email, username, confirmationLink);
 
-    return res.status(200).send({ ok: true });
+    return res.status(200).send();
   } catch (e) {
-    return res.status(500).send({ ok: false, error: e.message });
+    return res.status(500).send();
   }
 };
 
@@ -151,21 +165,6 @@ export const refreshTokens = async (req: Request, res: Response) => {
   }
 };
 
-export const revokeRefreshToken = async (_: Request, res: Response) => {
-  const id = res.locals.payload.userId; // from middleware
-  const user = await User.findOne({ where: { id } });
-
-  if (!user) {
-    return res.status(404).send({
-      message: 'User with given Id not found',
-    });
-  }
-
-  const revokedStatus = await revokeRefreshTokensForUser(user!);
-
-  return res.status(revokedStatus ? 200 : 500);
-};
-
 export const checkUsername = async (req: Request, res: Response) => {
   const existingUsername = await User.findOne({
     where: { username: req.query.username },
@@ -174,7 +173,7 @@ export const checkUsername = async (req: Request, res: Response) => {
   if (existingUsername) {
     return res.status(200).send({
       ok: false,
-      error: 'Account with the same username already exists',
+      message: 'Account with the same username already exists',
     });
   }
   return res.status(200).send({ ok: true });
@@ -188,7 +187,7 @@ export const checkEmail = async (req: Request, res: Response) => {
   if (existingEmail) {
     return res.status(200).send({
       ok: false,
-      error: 'Account with the same email already exists',
+      message: 'Account with the same email already exists',
     });
   }
   return res.status(200).send({ ok: true });
@@ -202,8 +201,8 @@ export const confirmEmail = async (req: Request, res: Response) => {
       { id: payload.userId },
       { isVerified: true },
     );
-  } catch (error) {
-    res.status(400).send({ error });
+  } catch (e) {
+    res.status(400).send({ message: e });
   }
 
   return res.redirect(`${process.env.CLIENT_SIDE_URL}/login`);

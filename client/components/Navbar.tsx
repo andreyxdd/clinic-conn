@@ -13,15 +13,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
-import shallow from 'zustand/shallow';
 import Link from 'next/link';
 import { navigationPaths } from '../config/paths';
 import { IPathProps } from '../config/types';
-import { useStore } from '../context/storeZustand';
-// import { IPathProps, IUser } from '../config/types';
-import env from '../config/env';
-import { setAccessToken } from '../config/auth';
-import poster from '../lib/api/csr/poster';
+import useAuth from '../customHooks/useAuth';
 
 const AuthButton = styled(LoadingButton)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
@@ -42,24 +37,19 @@ const Navbar: React.FC<INavbarProps> = (
 ) => {
   const router = useRouter();
   const isMobile = useMediaQuery('(max-width:600px)');
-  const {
-    user, setUser,
-  } = useStore(
-    (store) => ({
-      user: store.user,
-      setUser: store.setUser,
-    }),
-    shallow,
-  );
-
+  const { logout, user } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleLogout = async () => {
     console.log('Logout!');
-    await poster(`${env.api}/auth/logout`);
-    setAccessToken('');
-    setUser(null);
-    router.push('/home');
+    const res = await logout();
+
+    if (res.ok) {
+      // TODO: toast
+      router.push('/home');
+    } else {
+      // TODO: toast
+    }
   };
 
   const handleOpenDrawer = () => {

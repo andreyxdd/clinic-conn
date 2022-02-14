@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import handlebars from 'handlebars';
+import logger from './logUtils';
 
 require('dotenv').config();
 const sgMail = require('@sendgrid/mail');
@@ -34,11 +35,10 @@ export const sendConfirmation = async (
   // sending over email
   try {
     await sgMail.send(msg);
-  } catch (error) {
-    console.error(error);
-
-    if (error.response) {
-      console.error(error.response.body);
+  } catch (e) {
+    logger.error(e);
+    if (e.response) {
+      logger.error(e.response.body);
     }
   }
 };

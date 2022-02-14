@@ -2,8 +2,8 @@ import React from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import Grid from '@mui/material/Grid';
-import { useRouter } from 'next/router';
-import useNoLayoutPage from '../customHooks/useNoLayoutPage';
+import useLayout from '../customHooks/useLayout';
+import useRedirect from '../customHooks/useRedirect';
 
 export async function getStaticProps() {
   return {
@@ -13,15 +13,8 @@ export async function getStaticProps() {
 
 // eslint-disable-next-line no-unused-vars
 const Notfound: NextPage = (props) => {
-  const router = useRouter();
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      router.push('/home');
-    }, 6000);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useNoLayoutPage('xl');
+  useLayout();
+  useRedirect({ after: 6, where: '/home', whom: 'all' });
 
   // purple x moss 2020
   return (

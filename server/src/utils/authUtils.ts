@@ -3,8 +3,9 @@ import { NextFunction, Response, Request } from 'express';
 import { getConnection } from 'typeorm';
 import User from '../entities/User';
 import { cookiesOptions } from '../config';
+import logger from './logUtils';
 
-export const createAccessToken = (user: User) => sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '10m' });
+export const createAccessToken = (user: User) => sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '12m' });
 
 export const createRefreshToken = (user: User) => sign({ userId: user.id, tokenVersion: user.tokenVersion }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
 
@@ -21,7 +22,7 @@ export const revokeRefreshTokensForUser = async (user: User) => {
   try {
     await getConnection().getRepository(User).increment({ id: user.id }, 'tokenVersion', 1);
   } catch (e) {
-    console.log(e);
+    logger.error(e);
     return false;
   }
   return true;
@@ -31,7 +32,7 @@ export const revokeRefreshTokensForUser = async (user: User) => {
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
 
-  console.log(authorization);
+  logger.info(authorization);
 
   if (!authorization) {
     res.status(401);

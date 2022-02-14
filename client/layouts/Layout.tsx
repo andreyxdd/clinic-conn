@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 import TransitionLoader from '../components/TransitionLoader';
 import Copyright from '../components/Copyright';
 import MobileDrawer from '../components/MobileDrawer';
-import { useStore } from '../context/storeZustand';
+import { useUIStore } from '../context/UIStore';
 
 interface ILayoutProps {
   children: React.ReactNode;
@@ -18,7 +18,7 @@ const Layout: React.FC<ILayoutProps> = ({ children }) => {
 
   const {
     containerMaxWidth, showNavbar,
-  } = useStore(
+  } = useUIStore(
     (store) => ({
       containerMaxWidth: store.containerMaxWidth,
       showNavbar: store.showNavbar,

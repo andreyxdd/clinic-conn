@@ -19,7 +19,7 @@ const numbers = /^([^0-9]*)$/;
 
 interface ICheckFieldProps{
   ok: boolean;
-  error: string;
+  message: string;
 }
 
 export interface IValidatorProps{
@@ -40,7 +40,7 @@ async function checkEmail(emailToCheck: string): Promise<ICheckFieldProps> {
     console.log('%cvalidateInput.tsx line:40 e', 'color: #007acc;', e);
   }
 
-  return { ok: false, error: 'Internal Client Error' };
+  return { ok: false, message: 'Internal Server Error' };
 }
 
 // method to check if the same username existed in db
@@ -55,7 +55,7 @@ async function checkUsername(usernameToCheck: string):Promise<ICheckFieldProps> 
     console.log('%cvalidateInput.tsx line:55 e', 'color: #007acc;', e);
   }
 
-  return { ok: false, error: 'Internal Client Error' };
+  return { ok: false, message: 'Internal Server Error' };
 }
 
 export async function validateEmail(
@@ -67,9 +67,9 @@ export async function validateEmail(
     return 'Incorrect email provided';
   }
   if (checkInDB) {
-    const { ok, error } = await checkEmail(value);
+    const { ok, message } = await checkEmail(value);
     if (!ok) {
-      return error;
+      return message;
     }
   }
 
@@ -88,9 +88,9 @@ export async function validateUsername(
   } if (maxInputLength.test(value)) {
     return 'Username can\'t be that long';
   } if (checkInDB) {
-    const { ok, error } = await checkUsername(value);
+    const { ok, message } = await checkUsername(value);
     if (!ok) {
-      return error;
+      return message;
     }
   }
   return '';

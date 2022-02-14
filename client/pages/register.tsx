@@ -2,8 +2,8 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import Typography from '@mui/material/Typography';
 import SkeletonLoader from '../components/RegisterForm/SkeletonLoader';
-import useUserRedirect from '../customHooks/useUserRedirect';
-import useNoLayoutPage from '../customHooks/useNoLayoutPage';
+import useRedirect from '../customHooks/useRedirect';
+import useLayout from '../customHooks/useLayout';
 
 const RegisterForm = dynamic(
   () => import('../components/RegisterForm/RegisterForm'),
@@ -12,8 +12,8 @@ const RegisterForm = dynamic(
 interface IRegisterProps {}
 
 const Register: React.FC<IRegisterProps> = () => {
-  const isUser = useUserRedirect({ after: 6, where: '/home' });
-  useNoLayoutPage();
+  const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
+  useLayout({ showNavbar: false, showTransition: false, containerMaxWidth: 'xs' });
 
   return (
     <>
