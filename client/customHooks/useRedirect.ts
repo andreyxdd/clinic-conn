@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { useAuthStore } from '../context/AuthStore';
-// import useUser from './useUser';
 
 interface IUseUserRedirect{
   after: number; // in secs after which to redirect user

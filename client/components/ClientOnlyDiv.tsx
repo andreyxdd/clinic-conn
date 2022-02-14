@@ -10,6 +10,7 @@ const ClientOnlyDiv: React.FC<IClientOnlyDiv> = ({ children, style, ...delegated
 
   useEffect(() => {
     setHasMounted(true);
+    return () => { setHasMounted(false); };
   }, []);
 
   if (!hasMounted) {

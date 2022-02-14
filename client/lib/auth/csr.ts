@@ -66,7 +66,14 @@ export async function fetcher<T>(uri: string): Promise<QueryResponse<T>> {
  */
 export async function poster<T>(url: string, payload?: unknown): Promise<QueryResponse<T>> {
   try {
-    const request = () => axios.post(url, payload, { withCredentials: true });
+    const request = () => axios.post(
+      url,
+      payload,
+      {
+        withCredentials: true,
+        headers: { authorization: `bearer ${getAccessToken()}` },
+      },
+    );
     const { data } = await handleRequest(request);
     return { error: null, data };
   } catch (error : any) {

@@ -10,6 +10,7 @@ import {
 } from '../utils/authUtils';
 import { timeToUpdateRefreshToken } from '../config/index';
 import { sendConfirmation } from '../utils/emailUtils';
+// import logger from '../utils/logUtils';
 
 //--
 
@@ -67,11 +68,10 @@ export const logout = async (_: Request, res: Response) => {
     });
   }
 
+  const revokedStatus = await revokeRefreshTokensForUser(user!);
   attachRefreshToken(res, '');
 
-  const revokedStatus = await revokeRefreshTokensForUser(user!);
-
-  return res.status(revokedStatus ? 200 : 500);
+  return res.status(revokedStatus ? 200 : 500).send();
 };
 
 export const register = async (req: Request, res: Response) => {

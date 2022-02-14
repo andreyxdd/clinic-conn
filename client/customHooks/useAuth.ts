@@ -27,13 +27,17 @@ const useAuth = () => {
   const fetchUser = React.useCallback(async () => {
     const res = await fetcher<IUser>(`${env.api}/user/get`);
     if (res.data) setUser(res.data);
-    setUserHasMounted();
+    setUserHasMounted(true);
   }, []);
 
   React.useEffect(() => {
     if (isBrowser) {
       if (!userHasMounted) { fetchUser(); }
     }
+    return () => {
+      setUser(null);
+      setUserHasMounted(false);
+    };
   }, []);
 
   return {

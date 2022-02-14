@@ -20,7 +20,8 @@ export interface IAuthStore {
   logout: () => Promise<IAuthStoreResponse>;
   // eslint-disable-next-line no-unused-vars
   setUser: (user: IUser | null) => void;
-  setUserHasMounted: () => void;
+  // eslint-disable-next-line no-unused-vars
+  setUserHasMounted: (b: boolean) => void;
 }
 
 const initialState = {
@@ -104,7 +105,7 @@ export const initializeStore = (preloadedState = {}) => (
         return { ok: true };
       },
       // --
-      setUserHasMounted: () => { set({ userHasMounted: true }); },
+      setUserHasMounted: (b: boolean) => { set({ userHasMounted: b }); },
       setUser: (user: IUser | null) => { set({ user }); },
     }),
     // -- persist data using sessionStorage
