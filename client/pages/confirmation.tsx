@@ -4,6 +4,7 @@ import { Typography, Button, Grid } from '@mui/material';
 import Link from 'next/link';
 import useRedirect from '../customHooks/useRedirect';
 import useLayout from '../customHooks/useLayout';
+import ClientOnlyDiv from '../components/ClientOnlyDiv';
 
 /**
  * This is the landing page.
@@ -14,7 +15,7 @@ const Landing: NextPage = (): JSX.Element => {
   const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
 
   return (
-    <>
+    <ClientOnlyDiv>
       <Grid
         container
         spacing={3}
@@ -77,7 +78,7 @@ const Landing: NextPage = (): JSX.Element => {
           )}
 
       </Grid>
-    </>
+    </ClientOnlyDiv>
   );
 };
 

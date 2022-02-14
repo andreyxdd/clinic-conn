@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import SkeletonLoader from '../components/LoginForm/SkeletonLoader';
 import useRedirect from '../customHooks/useRedirect';
 import useLayout from '../customHooks/useLayout';
+import ClientOnlyDiv from '../components/ClientOnlyDiv';
 
 const LoginForm = dynamic(
   () => import('../components/LoginForm/LoginForm'),
@@ -18,7 +19,7 @@ const Login: NextPage<ILoginPageProps> = () => {
   useLayout({ showNavbar: false, showTransition: false, containerMaxWidth: 'xs' });
 
   return (
-    <>
+    <ClientOnlyDiv>
       {!isUser ? (
         <LoginForm />
       ) : (
@@ -34,7 +35,7 @@ const Login: NextPage<ILoginPageProps> = () => {
           You are already logged in
         </Typography>
       )}
-    </>
+    </ClientOnlyDiv>
   );
 };
 export default Login;

@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import SkeletonLoader from '../components/RegisterForm/SkeletonLoader';
 import useRedirect from '../customHooks/useRedirect';
 import useLayout from '../customHooks/useLayout';
+import ClientOnlyDiv from '../components/ClientOnlyDiv';
 
 const RegisterForm = dynamic(
   () => import('../components/RegisterForm/RegisterForm'),
@@ -16,7 +17,7 @@ const Register: React.FC<IRegisterProps> = () => {
   useLayout({ showNavbar: false, showTransition: false, containerMaxWidth: 'xs' });
 
   return (
-    <>
+    <ClientOnlyDiv>
       {!isUser ? (
         <RegisterForm />
       ) : (
@@ -33,7 +34,7 @@ const Register: React.FC<IRegisterProps> = () => {
           You are already registered
         </Typography>
       )}
-    </>
+    </ClientOnlyDiv>
   );
 };
 
