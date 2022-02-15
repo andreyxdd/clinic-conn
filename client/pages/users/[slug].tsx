@@ -1,9 +1,15 @@
 import React from 'react';
 import type { NextPage } from 'next';
-import Typography from '@mui/material/Typography';
-import VideoCallContainer from '../../components/VideoCallContainer';
+import { useRouter } from 'next/router';
+import { Button, Typography } from '@mui/material';
 import useLayout from '../../customHooks/useLayout';
 import useAuth from '../../customHooks/useAuth';
+// import VideoCallContainer from '../../components/VideoCallContainer';
+// import ChatContainer from '../../components/Chat/Chat';
+import ClientOnlyDiv from '../../components/ClientOnlyDiv';
+import { poster } from '../../lib/auth/csr';
+import env from '../../config/env';
+import { useSockets } from '../../context/SocketContext';
 
 export const getServerSideProps = async (context: { query: { slug: string | null; }; }) => {
   let { slug } = context.query;
@@ -21,6 +27,9 @@ interface IUserPageProps {
 }
 
 const UserPage: NextPage<IUserPageProps> = (props) => {
+  const router = useRouter();
+  const { setChatId } = useSockets();
+
   const [isLoading, setIsLoading] = React.useState(true);
 
   // const router = useRouter();
@@ -30,15 +39,26 @@ const UserPage: NextPage<IUserPageProps> = (props) => {
   const { user } = useAuth();
 
   React.useEffect(() => {
-    if (user && user.username === slug) {
+    // TODO: dont forget to correct below
+    if (user
+      && (user.username === 'volkov' || user.username === 'sample')) {
       setShowContent(true);
     }
     setIsLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  const handleStartChat = async () => {
+    const res = await poster < { chatId: number }>(`${env.api}/chat/create`, { target: slug });
+
+    if (res.data) {
+      setChatId(res.data.chatId);
+      router.push('/chat');
+    }
+  };
+
   return (
-    <>
+    <ClientOnlyDiv>
       {isLoading ? <div>Loading ... </div> : (
         <>
           {showContent ? (
@@ -47,9 +67,17 @@ const UserPage: NextPage<IUserPageProps> = (props) => {
                 Hi,
                 {' '}
                 {user?.username}
-                . Are you ready to start the call?
+                . This is page of
+                {' '}
+                {slug}
+                {' '}
+                user.
               </Typography>
-              <VideoCallContainer />
+              <Button type='button' onClick={handleStartChat}>
+                Start Chat with
+                {' '}
+                {slug}
+              </Button>
             </div>
           )
             : (
@@ -60,7 +88,7 @@ const UserPage: NextPage<IUserPageProps> = (props) => {
         </>
       )}
 
-    </>
+    </ClientOnlyDiv>
   );
 };
 

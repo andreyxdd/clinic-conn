@@ -6,7 +6,16 @@ ALTER TABLE "user"
 
 ALTER TABLE "user" 
   RENAME COLUMN birth TO birthday;
+
+
+DROP TABLE "UserVerification";
+ALTER TABLE "userVerification"
+  RENAME TO "UserVerification";
 */
 
-ALTER TABLE user_verification
-  RENAME TO userVerification;
+DROP TABLE "UserChat";
+DROP TABLE "Chat";
+DROP TABLE "User";
+
+ALTER TABLE "user"
+  RENAME TO "User";

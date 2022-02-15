@@ -76,7 +76,7 @@ export async function poster<T>(url: string, payload?: unknown): Promise<QueryRe
     );
     const { data } = await handleRequest(request);
     return { error: null, data };
-  } catch (error : any) {
+  } catch (error: any) {
     return { error, data: null };
   }
 }

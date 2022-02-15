@@ -4,7 +4,7 @@ import {
 } from 'typeorm';
 import User from './User';
 
-@Entity({ name: 'userVerification' })
+@Entity({ name: 'UserVerification' })
 class UserVerification extends BaseEntity {
   @PrimaryGeneratedColumn()
     id: number;

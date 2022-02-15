@@ -34,10 +34,11 @@ const useAuth = () => {
     if (isBrowser) {
       if (!userHasMounted) { fetchUser(); }
     }
+    /*
     return () => {
       setUser(null);
       setUserHasMounted(false);
-    };
+    }; */
   }, []);
 
   return {

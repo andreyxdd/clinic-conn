@@ -17,11 +17,13 @@ import logger from './utils/logUtils';
 // Routing
 import { default as authRouter } from './routes/authRoutes';
 import { default as userRouter } from './routes/userRoutes';
+import { default as chatRouter } from './routes/chatRoutes';
 import { corsOptions } from './config/index';
 import User from './entities/User';
 
 // Sockets
-import videoSocket from './videoSocket';
+// import videoSocket from './sockets/videoSocket';
+import chatSocket from './sockets/chatSocket';
 
 require('dotenv').config();
 
@@ -33,7 +35,17 @@ require('dotenv').config();
   const httpServer = createServer(app);
 
   // initiate socket connection
-  const io = new Server(httpServer, {
+  /*
+  const ioVideo = new Server(httpServer, {
+    cors: {
+      origin: process.env.CLIENT_SIDE_URL!,
+      credentials: true,
+      methods: ['GET', 'POST'],
+    },
+  });
+  */
+
+  const ioChat = new Server(httpServer, {
     cors: {
       origin: process.env.CLIENT_SIDE_URL!,
       credentials: true,
@@ -99,6 +111,7 @@ require('dotenv').config();
   app.use('/api', limiter);
   app.use('/api/auth', authRouter);
   app.use('/api/user', userRouter);
+  app.use('/api/chat', chatRouter);
 
   // -- db
   await createConnection();
@@ -108,7 +121,8 @@ require('dotenv').config();
   httpServer.listen(PORT, () => {
     logger.info(`Server running on port: ${PORT}`);
 
-    videoSocket({ io });
+    chatSocket({ io: ioChat });
+    // videoSocket({ io: ioVideo });
   });
   //--
 })();

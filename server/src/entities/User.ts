@@ -3,8 +3,9 @@ import {
   BaseEntity, UpdateDateColumn, CreateDateColumn, OneToMany,
 } from 'typeorm';
 import UserVerification from './UserVerification';
+import UserChat from './UserChat';
 
-@Entity({ name: 'user' })
+@Entity({ name: 'User' })
 class User extends BaseEntity {
   @PrimaryGeneratedColumn()
     id: number;
@@ -44,6 +45,9 @@ class User extends BaseEntity {
 
   @OneToMany(() => UserVerification, (userVerification) => userVerification.user)
     userVerifications: UserVerification[];
+
+  @OneToMany(() => UserChat, (uc) => uc.user)
+    chatConnections: UserChat[];
 }
 
 export default User;

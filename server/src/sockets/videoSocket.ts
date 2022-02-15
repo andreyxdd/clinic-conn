@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import logger from './utils/logUtils';
+import logger from '../utils/logUtils';
 
 const EVENTS = {
   connection: 'connection',
@@ -14,7 +14,7 @@ const EVENTS = {
 // const rooms: Record<string, { name: string }> = {};
 
 function videoSocket({ io }: { io: Server }) {
-  logger.info('Sockets enabled');
+  logger.info('Video-call Sockets enabled');
 
   io.on(EVENTS.connection, (socket: Socket) => {
     logger.info(`User connected ${socket.id}`);

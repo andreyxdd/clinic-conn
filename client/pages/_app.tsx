@@ -11,6 +11,7 @@ import createEmotionCache from '../lib/emotion/createEmotionCache';
 import '../styles/globals.css';
 import { useCreateUIStore, UIProvider } from '../context/UIStore';
 import { useCreateAuthStore, AuthProvider } from '../context/AuthStore';
+import SocketProvider from '../context/SocketContext';
 import Layout from '../layouts/Layout';
 
 // Client-side cache, shared for the whole session of the user in the browser
@@ -29,28 +30,31 @@ const App = (props: IAppProps) => {
   const createAuthStore = useCreateAuthStore(pageProps?.initialZustandState);
 
   // Provider is for common UI states (Zustand)
-  // AuthProvider is for user state (Context API)
+  // AuthProvider is for user state (Zustand)
+  // SocketProvider to manage sockets (Context API)
   return (
     <UIProvider createStore={createStore}>
       <AuthProvider createStore={createAuthStore}>
-        <CacheProvider value={emotionCache}>
-          <Head>
-            <title>WorldMedExpo</title>
-            {/*
+        <SocketProvider>
+          <CacheProvider value={emotionCache}>
+            <Head>
+              <title>WorldMedExpo</title>
+              {/*
           <link
             rel='icon'
             href='https://img.icons8.com/color/48/000000/diamond.png'
           /> */}
-            <meta name='viewport' content='initial-scale=1, width=device-width' />
-          </Head>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Layout>
-              <NextNprogress color='white' options={{ easing: 'ease', speed: 500 }} />
-              <Component {...pageProps} />
-            </Layout>
-          </ThemeProvider>
-        </CacheProvider>
+              <meta name='viewport' content='initial-scale=1, width=device-width' />
+            </Head>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <Layout>
+                <NextNprogress color='white' options={{ easing: 'ease', speed: 500 }} />
+                <Component {...pageProps} />
+              </Layout>
+            </ThemeProvider>
+          </CacheProvider>
+        </SocketProvider>
       </AuthProvider>
     </UIProvider>
   );

@@ -30,3 +30,10 @@ export interface IRegisterProps{
   lastName: string | null;
   birthday: string | null;
 }
+
+export interface IMessage{
+  chatId?: string;
+  message: string;
+  username: string;
+  time: string;
+}
