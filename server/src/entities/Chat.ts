@@ -3,6 +3,7 @@ import {
   BaseEntity, CreateDateColumn, OneToMany,
 } from 'typeorm';
 import UserChat from './UserChat';
+import Message from './Message';
 
 @Entity({ name: 'Chat' })
 class Chat extends BaseEntity {
@@ -14,6 +15,9 @@ class Chat extends BaseEntity {
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
     createdAt: Date;
+
+  @OneToMany(() => Message, (msg) => msg.chat)
+    messages: Message[];
 }
 
 export default Chat;

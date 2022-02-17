@@ -11,7 +11,7 @@ class UserVerification extends BaseEntity {
 
   //--
   @Column()
-    userId: string;
+    userId: number;
 
   @ManyToOne(() => User, (user) => user.userVerifications)
 

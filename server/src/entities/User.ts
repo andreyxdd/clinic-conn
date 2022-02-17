@@ -4,6 +4,7 @@ import {
 } from 'typeorm';
 import UserVerification from './UserVerification';
 import UserChat from './UserChat';
+import Message from './Message';
 
 @Entity({ name: 'User' })
 class User extends BaseEntity {
@@ -48,6 +49,9 @@ class User extends BaseEntity {
 
   @OneToMany(() => UserChat, (uc) => uc.user)
     chatConnections: UserChat[];
+
+  @OneToMany(() => Message, (msg) => msg.user)
+    messages: Message[];
 }
 
 export default User;

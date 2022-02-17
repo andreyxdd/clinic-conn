@@ -20,6 +20,7 @@ import { default as userRouter } from './routes/userRoutes';
 import { default as chatRouter } from './routes/chatRoutes';
 import { corsOptions } from './config/index';
 import User from './entities/User';
+import Message from './entities/Message';
 
 // Sockets
 // import videoSocket from './sockets/videoSocket';
@@ -104,6 +105,21 @@ require('dotenv').config();
   app.get('/users', async (_, res) => {
     const users = await User.find({ select: ['username', 'email', 'id'] });
     res.send(users);
+  });
+
+  app.post('/postMessage', async (req, res) => {
+    const { chatId, userId, text } = req.body;
+    logger.info(req.body);
+    if (chatId && userId && text) {
+      const date = new Date();
+      await Message.insert({
+        chatId: Number(chatId),
+        userId: Number(userId),
+        text: text as string,
+        sentAt: date,
+      });
+    }
+    res.send();
   });
   //--
 
