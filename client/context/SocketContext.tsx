@@ -4,7 +4,7 @@ import {
 import { io, Socket } from 'socket.io-client';
 import env from '../config/env';
 import EVENTS from '../config/events';
-import { IMessage } from '../config/types';
+import { IMessageold } from '../config/types';
 
 const socket = io(env.socket, {
   withCredentials: true,
@@ -16,7 +16,7 @@ interface ISocketContext{
   setChatId: Function;
   chats: object;
   setChats: Function;
-  messages: Array<IMessage>;
+  messages: Array<IMessageold>;
   setMessages: Function;
 }
 
@@ -30,7 +30,7 @@ interface ISocketProvider{
 const SocketsProvider = ({ children }: ISocketProvider) => {
   const [chatId, setChatId] = useState(null);
   const [chats, setChats] = useState({});
-  const [messages, setMessages] = useState<Array<IMessage>>([]);
+  const [messages, setMessages] = useState<Array<IMessageold>>([]);
 
   // unmount message from the tab when focused
   useEffect(() => {
@@ -49,7 +49,7 @@ const SocketsProvider = ({ children }: ISocketProvider) => {
     setMessages([]);
   });
 
-  socket.on(EVENTS.SERVER.ROOM_MESSAGE, (newMessage: IMessage) => {
+  socket.on(EVENTS.SERVER.ROOM_MESSAGE, (newMessage: IMessageold) => {
     // show message on the tab if not focused
     if (!document.hasFocus()) {
       document.title = 'New message ...';

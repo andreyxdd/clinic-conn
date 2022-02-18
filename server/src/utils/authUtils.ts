@@ -5,7 +5,7 @@ import User from '../entities/User';
 import { cookiesOptions } from '../config';
 import logger from './logUtils';
 
-export const createAccessToken = (user: User) => sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '12m' });
+export const createAccessToken = (user: User) => sign({ userId: user.id, username: user.username }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '12m' });
 
 export const createRefreshToken = (user: User) => sign({ userId: user.id, tokenVersion: user.tokenVersion }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
 

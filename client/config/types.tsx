@@ -31,9 +31,22 @@ export interface IRegisterProps{
   birthday: string | null;
 }
 
-export interface IMessage{
+export interface IMessageold{
   chatId?: string;
   message: string;
   username: string;
   time: string;
+}
+
+export interface IMessage{
+  username: string;
+  text: string;
+  sentAt: Date;
+  id: number;
+}
+
+export interface IChat{
+  chatId: number;
+  messages: Array<IMessage>
+  participantUsername: string;
 }

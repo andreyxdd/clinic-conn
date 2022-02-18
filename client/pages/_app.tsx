@@ -11,7 +11,7 @@ import createEmotionCache from '../lib/emotion/createEmotionCache';
 import '../styles/globals.css';
 import { useCreateUIStore, UIProvider } from '../context/UIStore';
 import { useCreateAuthStore, AuthProvider } from '../context/AuthStore';
-import SocketProvider from '../context/SocketContext';
+import ChatProvider from '../context/ChatContext';
 import Layout from '../layouts/Layout';
 
 // Client-side cache, shared for the whole session of the user in the browser
@@ -31,11 +31,11 @@ const App = (props: IAppProps) => {
 
   // Provider is for common UI states (Zustand)
   // AuthProvider is for user state (Zustand)
-  // SocketProvider to manage sockets (Context API)
+  // ChatProvider to manage chat sockets (Context API)
   return (
     <UIProvider createStore={createStore}>
       <AuthProvider createStore={createAuthStore}>
-        <SocketProvider>
+        <ChatProvider>
           <CacheProvider value={emotionCache}>
             <Head>
               <title>WorldMedExpo</title>
@@ -54,7 +54,7 @@ const App = (props: IAppProps) => {
               </Layout>
             </ThemeProvider>
           </CacheProvider>
-        </SocketProvider>
+        </ChatProvider>
       </AuthProvider>
     </UIProvider>
   );

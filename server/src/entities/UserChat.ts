@@ -1,6 +1,6 @@
 import {
   Entity, JoinColumn, ManyToOne,
-  BaseEntity, CreateDateColumn, PrimaryColumn,
+  BaseEntity, PrimaryColumn,
 } from 'typeorm';
 import User from './User';
 import Chat from './Chat';
@@ -25,8 +25,6 @@ class UserChat extends BaseEntity {
     chat: Chat;
 
   // --
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
-    createdAt: Date;
 }
 
 export default UserChat;
