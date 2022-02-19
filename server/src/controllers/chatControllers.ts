@@ -6,7 +6,7 @@ import User from '../entities/User';
 import Chat from '../entities/Chat';
 import Message from '../entities/Message';
 import UserChat from '../entities/UserChat';
-import logger from '../utils/logUtils';
+import logger from '../utils/log';
 
 // eslint-disable-next-line no-unused-vars
 export const dummy = async (_req: Request, _res: Response) => { };

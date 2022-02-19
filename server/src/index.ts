@@ -12,7 +12,7 @@ import hpp from 'hpp';
 import { rateLimit } from 'express-rate-limit';
 import compression from 'compression';
 import { version as v } from '../package.json';
-import logger from './utils/logUtils';
+import logger from './utils/log';
 
 // Routing
 import { default as authRouter } from './routes/authRoutes';

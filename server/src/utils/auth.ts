@@ -3,7 +3,7 @@ import { NextFunction, Response, Request } from 'express';
 import { getConnection } from 'typeorm';
 import User from '../entities/User';
 import { cookiesOptions } from '../config';
-import logger from './logUtils';
+import logger from './log';
 
 export const createAccessToken = (user: User) => sign({ userId: user.id, username: user.username }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '12m' });
 

@@ -7,9 +7,9 @@ import UserVerification from '../entities/UserVerification';
 import {
   createAccessToken, createRefreshToken,
   attachRefreshToken, revokeRefreshTokensForUser, createConfirmationToken,
-} from '../utils/authUtils';
+} from '../utils/auth';
 import { timeToUpdateRefreshToken } from '../config/index';
-import { sendConfirmation } from '../utils/emailUtils';
+import { sendConfirmation } from '../utils/email';
 // import logger from '../utils/logUtils';
 
 //--

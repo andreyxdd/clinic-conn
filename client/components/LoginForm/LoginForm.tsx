@@ -8,6 +8,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
 import { LoadingButton } from '@mui/lab';
+import { useSnackbar } from 'notistack';
 import useAuth from '../../customHooks/useAuth';
 
 // custom
@@ -42,6 +43,7 @@ const LoginForm = () => {
   const [helper, setHelper] = React.useState('');
   const router = useRouter();
   const { login } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
 
   React.useEffect(() => {
     if (disabledSubmit) {
@@ -66,10 +68,16 @@ const LoginForm = () => {
       });
 
       if (res.ok) {
-        // TODO: toast('successfull log in');
+        enqueueSnackbar(
+          'You have successfully logged in',
+          { variant: 'success' },
+        );
         router.push('/home');
       } else {
-        // TODO: consider using toasts instead
+        enqueueSnackbar(
+          'Something went wrong. Please try again later',
+          { variant: 'error' },
+        );
         setShowFormHelper(true);
         setHelper(res.message!);
       }

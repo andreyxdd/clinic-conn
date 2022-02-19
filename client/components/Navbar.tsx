@@ -14,6 +14,7 @@ import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
+import { useSnackbar } from 'notistack';
 import { navigationPaths } from '../config/paths';
 import { IPathProps } from '../config/types';
 import useAuth from '../customHooks/useAuth';
@@ -39,13 +40,17 @@ const Navbar: React.FC<INavbarProps> = (
   const isMobile = useMediaQuery('(max-width:600px)');
   const { logout, user } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLogout = async () => {
     console.log('Logout!');
     const res = await logout();
 
     if (res.ok) {
-      // TODO: toast
+      enqueueSnackbar(
+        'You have successfully logged out',
+        { variant: 'success' },
+      );
       router.push('/home');
     } else {
       // TODO: toast

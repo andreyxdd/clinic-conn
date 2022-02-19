@@ -6,6 +6,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import NextNprogress from 'nextjs-progressbar';
+import { SnackbarProvider } from 'notistack';
 import theme from '../styles/theme';
 import createEmotionCache from '../lib/emotion/createEmotionCache';
 import '../styles/globals.css';
@@ -32,28 +33,38 @@ const App = (props: IAppProps) => {
   // Provider is for common UI states (Zustand)
   // AuthProvider is for user state (Zustand)
   // ChatProvider to manage chat sockets (Context API)
+  // SnackbarProvider to manage snackbar notifications (notistack)
+  // ChacheProvider to enable SSG and SSR for the MUI components
   return (
     <UIProvider createStore={createStore}>
       <AuthProvider createStore={createAuthStore}>
         <ChatProvider>
-          <CacheProvider value={emotionCache}>
-            <Head>
-              <title>WorldMedExpo</title>
-              {/*
+          <SnackbarProvider
+            maxSnack={3}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+          >
+            <CacheProvider value={emotionCache}>
+              <Head>
+                <title>WorldMedExpo</title>
+                {/*
           <link
             rel='icon'
             href='https://img.icons8.com/color/48/000000/diamond.png'
           /> */}
-              <meta name='viewport' content='initial-scale=1, width=device-width' />
-            </Head>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <Layout>
-                <NextNprogress color='white' options={{ easing: 'ease', speed: 500 }} />
-                <Component {...pageProps} />
-              </Layout>
-            </ThemeProvider>
-          </CacheProvider>
+                <meta name='viewport' content='initial-scale=1, width=device-width' />
+              </Head>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <Layout>
+                  <NextNprogress color='white' options={{ easing: 'ease', speed: 500 }} />
+                  <Component {...pageProps} />
+                </Layout>
+              </ThemeProvider>
+            </CacheProvider>
+          </SnackbarProvider>
         </ChatProvider>
       </AuthProvider>
     </UIProvider>

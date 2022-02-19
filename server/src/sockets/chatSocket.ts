@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { Server, Socket } from 'socket.io';
-import logger from '../utils/logUtils';
+import logger from '../utils/log';
 
 const EVENTS = {
   connection: 'connection',

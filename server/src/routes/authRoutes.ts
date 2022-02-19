@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware } from '../utils/authUtils';
+import { authMiddleware } from '../utils/auth';
 import {
   login, logout, register, resendConfirmationLink,
   refreshTokens, checkEmail, checkUsername, confirmEmail,

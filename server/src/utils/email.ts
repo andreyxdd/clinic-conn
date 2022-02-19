@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import handlebars from 'handlebars';
-import logger from './logUtils';
+import logger from './log';
 
 require('dotenv').config();
 const sgMail = require('@sendgrid/mail');
