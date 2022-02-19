@@ -5,10 +5,6 @@ import { Typography, Button, Grid } from '@mui/material';
 import Link from 'next/link';
 import useLayout from '../customHooks/useLayout';
 
-/**
- * This is the landing page.
- * @return {JSX.Element}
- */
 const Patients: NextPage = (): JSX.Element => {
   useLayout({ showNavbar: true, showTransition: false, containerMaxWidth: 'xl' });
 

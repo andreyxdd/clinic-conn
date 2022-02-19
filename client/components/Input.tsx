@@ -91,7 +91,6 @@ const Input: React.FC<IInputProps> = ({
   }, [value]);
 
   return (
-
     <Grid item xs={12} sm={halfWidth ? 6 : 12}>
       <FormControl
         variant='outlined'

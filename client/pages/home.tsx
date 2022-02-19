@@ -6,10 +6,6 @@ import useLayout from '../customHooks/useLayout';
 
 interface IHomePageProps { }
 
-/**
- * This is the landing page.
- * @return {JSX.Element}
- */
 const Home: NextPage<IHomePageProps> = (): JSX.Element => {
   useLayout({ showNavbar: true, showTransition: false, containerMaxWidth: 'xl' });
 

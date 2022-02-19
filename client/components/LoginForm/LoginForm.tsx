@@ -139,6 +139,13 @@ const LoginForm = () => {
             </Link>
           </Grid>
         </Grid>
+        <Grid container justifyContent='flex-end'>
+          <Grid item>
+            <Link href='/reconfirm' variant='body2'>
+              Resend confirmation link
+            </Link>
+          </Grid>
+        </Grid>
       </Box>
 
     </Box>

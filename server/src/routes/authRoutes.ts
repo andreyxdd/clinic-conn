@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { authMiddleware } from '../utils/authUtils';
 import {
-  login, logout, register, refreshTokens,
-  checkEmail, checkUsername, confirmEmail,
+  login, logout, register, resendConfirmationLink,
+  refreshTokens, checkEmail, checkUsername, confirmEmail,
 } from '../controllers/authControllers';
 
 const router = Router();
@@ -10,6 +10,7 @@ const router = Router();
 //--
 router.post('/login', login);
 router.post('/register', register);
+router.get('/reconfirm', resendConfirmationLink);
 router.get('/refresh_tokens', refreshTokens);
 router.get('/check_email', checkEmail);
 router.get('/check_email', checkEmail);

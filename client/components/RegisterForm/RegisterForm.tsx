@@ -113,7 +113,7 @@ const RegisterForm = () => {
         setShowFormHelper(true);
         setHelper(res.message);
       } else {
-        router.push('/confirmation');
+        router.push('/successful-registration');
       }
     }
 

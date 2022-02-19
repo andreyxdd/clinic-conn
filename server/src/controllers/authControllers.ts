@@ -108,8 +108,44 @@ export const register = async (req: Request, res: Response) => {
     // generating confirmation link
     const confirmationLink = `http://${req.headers.host}/api/auth/confirmation/${emailToken}`;
 
-    // emaling user
+    // emailing user
     sendConfirmation(email, username, confirmationLink);
+
+    return res.status(200).send();
+  } catch (e) {
+    return res.status(500).send();
+  }
+};
+
+export const resendConfirmationLink = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.query;
+
+    // inserting new user
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(400).send();
+    }
+
+    if (user?.isVerified) {
+      return res.status(403).send();
+    }
+
+    // creating verification token
+    const emailToken = createConfirmationToken(user.id);
+
+    // inserting new user verification record
+    UserVerification.insert({
+      userId: user.id,
+      emailToken,
+    });
+
+    // generating confirmation link
+    const confirmationLink = `http://${req.headers.host}/api/auth/confirmation/${emailToken}`;
+
+    // emailing user
+    sendConfirmation(email as string, user.username, confirmationLink);
 
     return res.status(200).send();
   } catch (e) {
@@ -194,16 +230,16 @@ export const checkEmail = async (req: Request, res: Response) => {
 };
 
 export const confirmEmail = async (req: Request, res: Response) => {
+  let payload: any = null;
   try {
-    let payload: any = null;
     payload = verify(req.params.token, process.env.EMAIL_TOKEN_SECRET!);
-    await User.update(
-      { id: payload.userId },
-      { isVerified: true },
-    );
   } catch (e) {
-    res.status(400).send({ message: e });
+    res.redirect(`${process.env.CLIENT_SIDE_URL}/unsuccessful-confirmation`);
   }
+  await User.update(
+    { id: payload.userId },
+    { isVerified: true },
+  );
 
   return res.redirect(`${process.env.CLIENT_SIDE_URL}/login`);
 };

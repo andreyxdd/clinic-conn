@@ -6,11 +6,7 @@ import useRedirect from '../customHooks/useRedirect';
 import useLayout from '../customHooks/useLayout';
 import ClientOnlyDiv from '../components/ClientOnlyDiv';
 
-/**
- * This is the landing page.
- * @return {JSX.Element}
- */
-const Landing: NextPage = (): JSX.Element => {
+const SuccessfulRegistration: NextPage = (): JSX.Element => {
   useLayout();
   const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
 
@@ -26,7 +22,7 @@ const Landing: NextPage = (): JSX.Element => {
         {isUser ? (
           <Grid item>
             <Typography variant='h4' align='center'>
-              Sorry, this page is not availble to you. In a few secs you will be redirected to Home page
+              Sorry, this page is not availble to you. In a few secs you will be redirected to the Home page
             </Typography>
           </Grid>
         )
@@ -76,10 +72,9 @@ const Landing: NextPage = (): JSX.Element => {
               </Grid>
             </>
           )}
-
       </Grid>
     </ClientOnlyDiv>
   );
 };
 
-export default Landing;
+export default SuccessfulRegistration;
