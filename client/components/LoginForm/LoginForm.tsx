@@ -80,10 +80,9 @@ const LoginForm = () => {
         );
         setShowFormHelper(true);
         setHelper(res.message!);
+        setIsloading(false);
       }
     }
-
-    setIsloading(false);
   };
   // --
 

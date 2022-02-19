@@ -27,20 +27,26 @@ const useUserRedirect = (
   const { user } = useAuthStore();
 
   React.useEffect(() => {
-    const redirectAfter = () => setTimeout(() => {
-      router.push(where);
-    }, after * 1000);
+    let isMounted = true;
 
-    if (whom === 'all') {
-      redirectAfter();
-    } else if (whom === 'user') {
-      if (user) redirectAfter();
-    } else if (whom === 'nonuser') {
-      if (!user) redirectAfter();
-    } else {
-      throw new Error(`Paramerter whom = ${whom} not implemented`);
+    if (isMounted) {
+      const redirectAfter = () => setTimeout(() => {
+        router.push(where);
+      }, after * 1000);
+
+      if (whom === 'all') {
+        redirectAfter();
+      } else if (whom === 'user') {
+        if (user) redirectAfter();
+      } else if (whom === 'nonuser') {
+        if (!user) redirectAfter();
+      } else {
+        throw new Error(`Paramerter whom = ${whom} not implemented`);
+      }
     }
-  }, [user]);
+
+    return () => { isMounted = false; };
+  }, []);
 
   return !!user;
 };
