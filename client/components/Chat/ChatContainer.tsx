@@ -17,6 +17,7 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
     <Grid
       container
       direction='row'
+      height='100%'
     >
       <Grid
         item
