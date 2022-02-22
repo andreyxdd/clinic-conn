@@ -9,3 +9,20 @@ export interface AuthContext{
   res: Response;
   payload?: IPayload;
 }
+
+export interface IMessage{
+  username: string;
+  text: string;
+  sentAt: Date;
+  id?: number;
+}
+
+export interface IChat{
+  chatId: number;
+  messages: Array<IMessage>
+  participantUsername: string;
+}
+
+export interface IChats{
+  chats: Array<IChat>;
+}

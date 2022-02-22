@@ -2,43 +2,42 @@ import { Grid } from '@mui/material';
 import React, { MutableRefObject } from 'react';
 import { useChat } from '../../context/ChatContext';
 import useAuth from '../../customHooks/useAuth';
-import { IMessage } from '../../config/types';
+import { IChat, IMessage } from '../../config/types';
+import events from '../../config/events';
 
 interface IMessagesContainer {
   xs: number
 }
 
 const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
-  const { currentChat } = useChat();
+  const { currentChat, setCurrentChat, socket } = useChat();
   const { user } = useAuth();
   const newMessageRef: MutableRefObject<HTMLTextAreaElement | null> = React.useRef(null);
 
   const handleSendMessages = () => {
-    if (newMessageRef.current !== null) {
-      const message = newMessageRef.current.value;
+    if (newMessageRef.current !== null && currentChat) {
+      const msgText = newMessageRef.current.value;
 
       // can't send white space
-      if (!String(message).trim()) return;
+      if (!String(msgText).trim()) return;
 
-      /*
-      const date = new Date();
-      const content = {
-        username: 'You',
-        fromSelf: true,
-        message,
-        time: `${date.getHours()}:${date.getMinutes()}`,
+      const content: IMessage = {
+        username: user!.username,
+        text: msgText,
+        sentAt: new Date(),
       };
 
-      socket.emit('private message', {
+      if (!socket) return;
+
+      socket!.emit(events.CLIENT.SEND_MESSAGE, {
         content,
-        to: currentUsername.userId,
+        to: `chat-${currentChat?.chatId}`,
       });
 
-      setMessages(
-        [...messages,
-          content],
-      );
-      */
+      setCurrentChat((currChat: IChat) => ({
+        ...currChat,
+        messages: [...currChat.messages, content],
+      }));
 
       newMessageRef.current.value = '';
     }
@@ -53,9 +52,9 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
         {
           currentChat.messages.map((msgProps: IMessage) => {
             if (msgProps.username === user.username) {
-              return <p style={{ textAlign: 'right' }} key={`${msgProps.id}`}>{msgProps.text}</p>;
+              return <p style={{ textAlign: 'right' }} key={`${msgProps.sentAt}`}>{msgProps.text}</p>;
             }
-            return <p style={{ textAlign: 'left' }} key={`${msgProps.id}`}>{msgProps.text}</p>;
+            return <p style={{ textAlign: 'left' }} key={`${msgProps.sentAt}`}>{msgProps.text}</p>;
           })
         }
       </Grid>

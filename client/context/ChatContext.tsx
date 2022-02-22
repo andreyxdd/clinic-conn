@@ -2,13 +2,11 @@ import {
   useState, createContext, useContext, useEffect,
 } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { fetcher } from '../lib/auth/csr';
+// import { fetcher } from '../lib/auth/csr';
 import env from '../config/env';
-import { IChat } from '../config/types';
-
-const socket = io(env.socket, {
-  withCredentials: true,
-});
+import { IChat, IMessage } from '../config/types';
+import useAuth from '../customHooks/useAuth';
+import events from '../config/events';
 
 interface IChatContext{
   socket: Socket;
@@ -25,18 +23,90 @@ interface IChatProvider{
   children: React.ReactNode;
 }
 
-// TODO: consider using SWR in this context
 const ChatProvider = ({ children }: IChatProvider) => {
+  // provider states
+  const { user } = useAuth();
   const [currentChat, setCurrentChat] = useState<IChat | null>(null);
   const [chats, setChats] = useState<Array<IChat>>([]);
+  // --
 
+  // -- initiate a socket connection
+  const [socket, setSocket] = useState<Socket>();
   useEffect(() => {
-    const getUserChats = async () => {
-      const res = await fetcher<Array<IChat>>(`${env.api}/chat/get_user_chats`);
-      if (res.data) setChats(res.data);
+    const s = io(env.socket, {
+      withCredentials: true,
+      autoConnect: false,
+      transports: ['websocket'],
+      upgrade: false,
+    });
+    setSocket(s);
+    return () => {
+      s.disconnect();
     };
-    getUserChats();
   }, []);
+  // --
+
+  // -- socket authorization
+  useEffect(() => {
+    if (user && socket) {
+      socket.auth = {
+        username: user.username,
+        userId: user.id,
+      };
+      socket.connect();
+    }
+    return () => {
+      if (socket) socket.off(events.connection_error);
+    };
+  }, [user, socket]);
+  // --
+
+  // -- Handle Client Socket Object
+  useEffect(() => {
+    if (!socket) return;
+
+    // use only in development
+    socket.onAny((event, ...args) => {
+      console.log(event, args);
+    });
+
+    // hadnling errors
+    socket.on(events.connection_error, (err) => {
+      console.log(err.message);
+    });
+
+    // getting all the user chats
+    socket.on(events.SERVER.USER_CHATS, (userChats: Array<IChat>) => {
+      setChats(userChats);
+    });
+
+    // getting new messages
+    socket.on(events.SERVER.CHAT_MESSAGE, (content: IMessage, fromChat: number) => {
+      setChats((currChats) => {
+        const updatedChats = currChats.map((chat) => {
+          if (chat.chatId === fromChat) {
+            return { ...chat, messages: [...chat.messages, content] };
+          }
+          return { ...chat };
+        });
+        return updatedChats;
+      });
+
+      // if the chat is currently opened
+      if (currentChat?.chatId === fromChat) {
+        setCurrentChat((currChat: IChat | null) => {
+          if (!currChat) return null;
+          return ({
+            ...currChat,
+            messages: [...currChat.messages, content],
+          });
+        });
+      }
+    });
+  }, [socket]);
+  // --
+
+  if (!socket) return <></>;
 
   return (
     <ChatContext.Provider value={{

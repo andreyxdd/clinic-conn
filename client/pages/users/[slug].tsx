@@ -9,7 +9,6 @@ import useAuth from '../../customHooks/useAuth';
 import ClientOnlyDiv from '../../components/ClientOnlyDiv';
 import { poster } from '../../lib/auth/csr';
 import env from '../../config/env';
-import { useSockets } from '../../context/SocketContext';
 
 export const getServerSideProps = async (context: { query: { slug: string | null; }; }) => {
   let { slug } = context.query;
@@ -28,7 +27,7 @@ interface IUserPageProps {
 
 const UserPage: NextPage<IUserPageProps> = (props) => {
   const router = useRouter();
-  const { setChatId } = useSockets();
+  // const { setChatId } = useSockets();
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -52,7 +51,7 @@ const UserPage: NextPage<IUserPageProps> = (props) => {
     const res = await poster < { chatId: number }>(`${env.api}/chat/create`, { target: slug });
 
     if (res.data) {
-      setChatId(res.data.chatId);
+      // setChatId(res.data.chatId);
       router.push('/chat');
     }
   };

@@ -42,7 +42,7 @@ export interface IMessage{
   username: string;
   text: string;
   sentAt: Date;
-  id: number;
+  id?: number;
 }
 
 export interface IChat{

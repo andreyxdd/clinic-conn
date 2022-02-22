@@ -127,3 +127,57 @@ export const getUserChats = async (_req: Request, res: Response) => {
     return res.status(500).send({ message: e.message });
   }
 };
+
+export const getUserChatsViaSockets = async (userId: number, username: string) => {
+  try {
+    const userChats = await UserChat.find({
+      where: { userId },
+      select: ['chatId'],
+    });
+
+    if (!userChats) {
+      // user doesn't have any chats
+      return [];
+    }
+
+    const userChatsWithMessages = await Promise.all(
+      userChats.map(async (uc: UserChat) => {
+        const { chatId } = uc;
+
+        const queryResult: Array<{ username: string }> = await getManager().query(
+          `
+          SELECT
+            "User"."username"
+          FROM "UserChat"
+          LEFT JOIN "User" ON "User"."id"="UserChat"."userId"
+          WHERE "UserChat"."userId" != $1 AND "UserChat"."chatId" = $2
+          LIMIT 1;
+          `,
+          [userId, chatId],
+        );
+        const participantUsername = queryResult[0].username;
+
+        const dbmessages = await Message.find({
+          where: { chatId },
+          select: ['userId', 'text', 'sentAt', 'id'],
+        });
+
+        const messages = dbmessages.map(
+          (msg) => ({
+            username: msg.userId !== userId ? participantUsername : username,
+            text: msg.text,
+            sentAt: msg.sentAt,
+            id: msg.id,
+          }),
+        );
+
+        return { chatId, messages, participantUsername };
+      }),
+    );
+
+    return userChatsWithMessages;
+  } catch (e) {
+    logger.error(e);
+    return [];
+  }
+};
