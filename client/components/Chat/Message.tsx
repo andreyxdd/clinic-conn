@@ -19,7 +19,7 @@ const StyledTypography = (
       borderRadius: '10px',
       backgroundColor: self ? '#eceff1' : '#1eb4ff',
       color: self ? 'black' : 'white',
-      maxWidth: '300px',
+      maxWidth: '400px',
     }}
     paragraph
     ref={innerRef}
@@ -45,7 +45,6 @@ const StyledMessage = (
     style={{
       display: 'flex',
       flexDirection: 'column',
-      marginTop: '20px',
       alignItems: self ? 'flex-end' : 'flex-start',
     }}
     onContextMenu={handleContextMenu}
@@ -73,7 +72,7 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
 
   return (
     <StyledMessage self={self} handleContextMenu={handleContextMenu}>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', marginBottom: '-12px' }}>
         {/*
       <img
         className='messageImg'
@@ -83,13 +82,14 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
       */}
         <StyledTypography self={self} innerRef={textRef}>{msgProps.text}</StyledTypography>
       </div>
-      <div style={{
-        fontSize: '12px',
-        marginTop: '10px',
-      }}
+      <Typography
+        variant='body2'
+        style={{
+          fontSize: '12px',
+        }}
       >
         {format(msgProps.sentAt)}
-      </div>
+      </Typography>
     </StyledMessage>
   );
 };

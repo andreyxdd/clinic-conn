@@ -1,5 +1,5 @@
 import {
-  Grid, IconButton, TextField,
+  Grid, IconButton, styled, TextField,
 } from '@mui/material';
 import React, { MutableRefObject } from 'react';
 import SendIcon from '@mui/icons-material/Send';
@@ -15,6 +15,28 @@ import yt from '../../utils/translator';
 interface IMessagesContainer {
   xs: number
 }
+
+const StyledMessagesGridContainer = styled(Grid)({
+  overflowY: 'auto',
+  height: 'calc(100vh - 280px)',
+  paddingBottom: 6,
+  paddingRight: 6,
+  '&::-webkit-scrollbar': {
+    width: '0.4vw',
+    border: '4px solid transparent',
+    borderRadius: '8px',
+    backgroundClip: 'padding-box',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#B0B0B0',
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor: '#888888',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: '#D3D3D3',
+  },
+});
 
 const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   const {
@@ -90,39 +112,45 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
       xs={xs}
       container
       direction='column'
+      wrap='nowrap'
       justifyContent='flex-end'
       sx={{ p: 1 }}
-      style={{ borderRadius: 2 }}
+      style={{
+        borderRadius: 2,
+        position: 'relative',
+      }}
     >
       {/* Messages */}
-      <Grid
+      <StyledMessagesGridContainer
         item
         container
-        direction='column'
-        sx={{ pb: 2 }}
+        direction='column-reverse'
+        wrap='nowrap'
       >
+        <div ref={messageEndRef} />
         {
-          currentChat.messages.map((msgProps: IMessage) => {
+          currentChat.messages.slice().reverse().map((msgProps: IMessage) => {
             if (msgProps.username === user.username) {
               return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self />;
             }
             return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self={false} />;
           })
         }
-        <div ref={messageEndRef} />
-      </Grid>
+      </StyledMessagesGridContainer>
       {/* Text area and buttons */}
       <Grid
         item
         container
-        justifyContent='space-between'
+        justifyContent='space-evenly'
         direction='row'
         sx={{
-          pr: 1, pl: 1, pb: 3, pt: 3,
+          pb: 10, pt: 3,
         }}
         style={{
           backgroundColor: '#fafbfc',
+          height: '80px',
         }}
+        spacing={0.5}
       >
         <Grid
           item
@@ -130,7 +158,6 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
           container
           justifyContent='center'
           alignItems='center'
-          sx={{ pr: 1 }}
         >
           <IconButton aria-label='attach-icon-btn' size='large'>
             <AttachFileIcon />
@@ -142,7 +169,6 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
           container
           justifyContent='center'
           alignItems='center'
-          sx={{ pl: 1, pr: 1 }}
         >
           <IconButton onClick={handleTranslate} aria-label='translate-icon-btn' size='large'>
             <TranslateIcon />
@@ -150,7 +176,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
         </Grid>
         <Grid
           item
-          xs={10.5}
+          xs={9.5}
           container
           justifyContent='center'
           alignItems='center'
@@ -171,7 +197,6 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
           container
           justifyContent='center'
           alignItems='center'
-          sx={{ pl: 1 }}
         >
           <IconButton onClick={handleSendMessages} aria-label='send-icon-btn' size='large'>
             <SendIcon />

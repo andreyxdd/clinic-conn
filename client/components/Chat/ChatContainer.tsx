@@ -15,11 +15,16 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
 
   return (
     <Grid
+      aria-label='chat-container'
       container
       direction='row'
-      height='100%'
+      alignItems='stretch'
+      style={{
+        height: 'calc(100vh - 160px)',
+      }}
     >
       <Grid
+        aria-label='chat-boxes-container'
         item
         xs={3}
         container

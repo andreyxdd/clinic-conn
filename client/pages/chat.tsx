@@ -11,7 +11,7 @@ const Chat: NextPage = (): JSX.Element => {
     <>
       {showContent ? (
         <ChatContainer />
-      ) : <p>No</p>}
+      ) : <p>No chat for you. Sorry.</p>}
     </>
   );
 };
