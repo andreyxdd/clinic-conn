@@ -4,11 +4,13 @@ import {
 import React, { MutableRefObject } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import TranslateIcon from '@mui/icons-material/Translate';
 import { useChat } from '../../context/ChatContext';
 import useAuth from '../../customHooks/useAuth';
 import { IChat, IMessage } from '../../config/types';
 import events from '../../config/events';
 import Message from './Message';
+import yt from '../../utils/translator';
 
 interface IMessagesContainer {
   xs: number
@@ -25,6 +27,17 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   React.useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentChat]);
+
+  const handleTranslate = async () => {
+    if (newMessageRef.current !== null && currentChat) {
+      const msgText = newMessageRef.current.value;
+
+      // can't translate white space
+      if (!String(msgText).trim()) return;
+
+      newMessageRef.current.value = await yt(msgText, 'en', 'ru');
+    }
+  };
 
   const handleSendMessages = () => {
     if (newMessageRef.current !== null && currentChat) {
@@ -125,7 +138,19 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
         </Grid>
         <Grid
           item
-          xs={11}
+          xs={0.5}
+          container
+          justifyContent='center'
+          alignItems='center'
+          sx={{ pl: 1, pr: 1 }}
+        >
+          <IconButton onClick={handleTranslate} aria-label='translate-icon-btn' size='large'>
+            <TranslateIcon />
+          </IconButton>
+        </Grid>
+        <Grid
+          item
+          xs={10.5}
           container
           justifyContent='center'
           alignItems='center'
