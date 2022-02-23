@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useLayoutEffect } from 'react';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -46,33 +46,32 @@ export const initializeStore = (preloadedState = {}) => (
       ...preloadedState,
       // -- login
       login: async ({ email, password }: ILoginProps): Promise<IAuthStoreResponse> => {
-        const res = await axios.post(`${env.api}/auth/login`,
-          {
-            email,
-            password,
-          },
-          { withCredentials: true });
+        try {
+          const res = await axios.post(`${env.api}/auth/login`,
+            {
+              email,
+              password,
+            },
+            { withCredentials: true });
 
-        if (res.status === 200) {
-          // seting access token in memory
-          setAccessToken(res.data.accessToken);
+          if (res.status === 200) {
+            // seting access token in memory
+            setAccessToken(res.data.accessToken);
 
-          // setting user in the store
-          set({ user: res.data.user });
+            // setting user in the store
+            set({ user: res.data.user });
 
-          return { ok: true };
-        }
-
-        if (res.status === 403) {
-          if (res.data.field === 'email') {
-            return { ok: false, message: 'User with provided email not found' };
-          } if (res.data.field === 'password') {
-            return { ok: false, message: 'Inalid password provided' };
-          } if (res.data.field === 'isVerified') {
-            return { ok: false, message: 'Your account is not comfirmed' };
+            return { ok: true };
+          }
+        } catch (error) {
+          const axiosError = error as AxiosError;
+          const errorRes = axiosError.response;
+          if (errorRes) {
+            if (errorRes.status === 403) {
+              return { ok: false, message: 'Invalid credentials provided or your account is not confirmed.' };
+            }
           }
         }
-
         return { ok: false, message: 'Internal Error' };
       },
       // --

@@ -14,6 +14,7 @@ const ChatItem = styled(Grid)({
   borderBottom: '1px solid grey',
   '&:hover': {
     backgroundColor: '#D3D3D3',
+    cursor: 'pointer',
   },
 });
 
@@ -79,7 +80,6 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
               <Typography variant='body1' noWrap sx={{ fontWeight: 'light' }}>
                 {lastMsg.text}
               </Typography>
-
             </ChatItem>
           );
         })}

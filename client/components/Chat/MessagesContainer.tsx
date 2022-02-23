@@ -105,8 +105,42 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
     }
   };
 
-  if (!currentChat) return <Grid item xs={xs}>Select chat to start messaging</Grid>;
-  if (!user) return <Grid item xs={xs}>Sorry this content is not availble for non-users</Grid>;
+  if (!currentChat) {
+    return (
+      <Grid
+        item
+        container
+        wrap='nowrap'
+        justifyContent='center'
+        alignItems='center'
+        xs={xs}
+        sx={{ p: 0.5 }}
+        style={{ border: '1px solid grey', borderRadius: '5px' }}
+      >
+        <Typography variant='h5'>
+          Select chat on the left to start messaging
+        </Typography>
+      </Grid>
+    );
+  }
+  if (!user) {
+    return (
+      <Grid
+        item
+        container
+        wrap='nowrap'
+        justifyContent='center'
+        alignItems='center'
+        xs={xs}
+        sx={{ p: 0.5 }}
+        style={{ border: '1px solid grey', borderRadius: '5px' }}
+      >
+        <Typography variant='h5'>
+          Sorry this content is not availble for non-users
+        </Typography>
+      </Grid>
+    );
+  }
 
   return (
     <Grid

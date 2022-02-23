@@ -4,7 +4,7 @@ import shallow from 'zustand/shallow';
 import Navbar from '../components/Navbar';
 import TransitionLoader from '../components/TransitionLoader';
 import Copyright from '../components/Copyright';
-import MobileDrawer from '../components/MobileDrawer';
+import UserDrawer from '../components/UserDrawer';
 import { useUIStore } from '../context/UIStore';
 
 interface ILayoutProps {
@@ -12,7 +12,7 @@ interface ILayoutProps {
 }
 
 const Layout: React.FC<ILayoutProps> = ({ children }) => {
-  const [openMobileDrawer, setOpenMobileDrawer] = React.useState(false);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
 
   const showTransition = false;
 
@@ -30,8 +30,8 @@ const Layout: React.FC<ILayoutProps> = ({ children }) => {
     <div>
       {showNavbar && (
         <Navbar
-          openMobileDrawer={openMobileDrawer}
-          setOpenMobileDrawer={setOpenMobileDrawer}
+          // openDrawer={openDrawer}
+          setOpenDrawer={setOpenDrawer}
         />
       )}
       {showTransition && <TransitionLoader />}
@@ -39,8 +39,8 @@ const Layout: React.FC<ILayoutProps> = ({ children }) => {
         component='main'
         maxWidth={containerMaxWidth as Breakpoint}
         onClick={() => {
-          if (openMobileDrawer) {
-            setOpenMobileDrawer(false);
+          if (openDrawer) {
+            setOpenDrawer(false);
           }
         }}
         style={{
@@ -58,9 +58,9 @@ const Layout: React.FC<ILayoutProps> = ({ children }) => {
         </div>
         <Copyright />
       </Container>
-      <MobileDrawer
-        openMobileDrawer={openMobileDrawer}
-        setOpenMobileDrawer={setOpenMobileDrawer}
+      <UserDrawer
+        openDrawer={openDrawer}
+        setOpenDrawer={setOpenDrawer}
       />
     </div>
   );

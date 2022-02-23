@@ -75,7 +75,7 @@ const LoginForm = () => {
         router.push('/home');
       } else {
         enqueueSnackbar(
-          'Something went wrong. Please try again later',
+          'Something went wrong',
           { variant: 'error' },
         );
         setShowFormHelper(true);
@@ -149,7 +149,7 @@ const LoginForm = () => {
         <Grid container justifyContent='flex-end'>
           <Grid item>
             <Link href='/reconfirm' variant='body2'>
-              Resend confirmation link
+              Need to confirm account? Resend confirmation link
             </Link>
           </Grid>
         </Grid>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { format } from 'timeago.js';
-import { Typography } from '@mui/material';
+import { styled, Typography } from '@mui/material';
 import { IMessage } from '../../config/types';
 import yt from '../../utils/translator';
 
@@ -28,7 +28,15 @@ const StyledTypography = (
   </Typography>
 );
 
-const StyledMessage = (
+const StyledDiv = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  '&:hover': {
+    cursor: 'context-menu',
+  },
+});
+
+const MessageContainer = (
   {
     children,
     self,
@@ -44,17 +52,15 @@ const StyledMessage = (
       handleDblClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
     },
 ) => (
-  <div
+  <StyledDiv
     style={{
-      display: 'flex',
-      flexDirection: 'column',
       alignItems: self ? 'flex-end' : 'flex-start',
     }}
     onContextMenu={handleContextMenu}
     onDoubleClick={handleDblClick}
   >
     {children}
-  </div>
+  </StyledDiv>
 );
 
 const Message = ({ msgProps, self }: IMessageComponent) => {
@@ -81,7 +87,7 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
   };
 
   return (
-    <StyledMessage
+    <MessageContainer
       self={self}
       handleContextMenu={handleContextMenu}
       handleDblClick={handleDblClick}
@@ -107,7 +113,7 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
           {format(msgProps.sentAt)}
         </Typography>
       )}
-    </StyledMessage>
+    </MessageContainer>
   );
 };
 

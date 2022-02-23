@@ -6,7 +6,7 @@ export const navigationPaths = [
 ];
 
 export const userPaths = [
-  { path: '/chatbox', title: 'Chatbox' },
-  { path: '/accaunt', title: 'My Account' },
+  { path: '/profile', title: 'My Profile' },
+  { path: '/chat', title: 'Chat' },
   { path: '/home', title: 'Logout' },
 ];

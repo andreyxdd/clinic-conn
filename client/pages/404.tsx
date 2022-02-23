@@ -65,7 +65,7 @@ const Notfound: NextPage = (props) => {
             right: 50%;
             margin-left: -50vw;
             margin-right: -50vw;
-            height: 100vh;
+            height: 101vh;
             margin-top: -100px;
             margin-bottom: -100px;
             background-color: #42a5f5;

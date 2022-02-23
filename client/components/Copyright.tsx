@@ -8,7 +8,12 @@ const Copyright: React.FC<ICopyrightProps> = () => (
     variant='body2'
     color='text.secondary'
     align='center'
-    sx={{ mt: 5 }}
+    style={{
+      position: 'relative',
+      bottom: '20px',
+      marginTop: '-20px',
+      paddingTop: '20px',
+    }}
   >
     {'Copyright © '}
     <Link color='inherit' href='/'>
