@@ -1,10 +1,21 @@
 import React from 'react';
-import { Grid, Paper, Typography } from '@mui/material';
+import {
+  Grid, styled, Typography,
+} from '@mui/material';
+import { format } from 'timeago.js';
 import { useChat } from '../../context/ChatContext';
 import { IChat } from '../../config/types';
 import MessagesContainer from './MessagesContainer';
 
 interface IChatContainerProps { }
+
+const ChatItem = styled(Grid)({
+  padding: '5px',
+  borderBottom: '1px solid grey',
+  '&:hover': {
+    backgroundColor: '#D3D3D3',
+  },
+});
 
 const ChatContainer: React.FC<IChatContainerProps> = () => {
   const { chats, setCurrentChat } = useChat();
@@ -26,38 +37,54 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
       <Grid
         aria-label='chat-boxes-container'
         item
-        xs={3}
+        xs={2}
         container
         direction='column'
-        spacing={3}
-        style={{
-          borderRight: '2px solid red',
-        }}
+        wrap='nowrap'
+        style={{ border: '1px solid grey', borderRadius: '5px', borderRight: '0px' }}
       >
         {chats.map((chat: IChat) => {
           const chatWithUsername = chat.participantUsername;
+          const [lastMsg] = chat.messages.slice(-1);
           return (
-            <Grid
+            <ChatItem
               item
               key={chat.chatId}
-              style={{
-                border: '1px solid blue',
-              }}
+              onClick={() => { handleChatClick(chat); }}
             >
-              <Paper
-                onClick={() => { handleChatClick(chat); }}
+              <Grid
+                container
+                direction='row'
+                justifyContent='space-between'
+                alignItems='center'
               >
-                <Typography variant='subtitle1'>
-                  Chat with:
-                  {' '}
-                  {chatWithUsername}
-                </Typography>
-              </Paper>
-            </Grid>
+                <Grid item>
+                  <Typography variant='subtitle1' noWrap sx={{ fontWeight: 'medium' }}>
+                    {chatWithUsername}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography
+                    variant='body2'
+                    sx={{
+                      position: 'relative',
+                      fontWeight: 'light',
+                    }}
+                    noWrap
+                  >
+                    {format(lastMsg.sentAt)}
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Typography variant='body1' noWrap sx={{ fontWeight: 'light' }}>
+                {lastMsg.text}
+              </Typography>
+
+            </ChatItem>
           );
         })}
       </Grid>
-      <MessagesContainer xs={9} />
+      <MessagesContainer xs={10} />
     </Grid>
   );
 };

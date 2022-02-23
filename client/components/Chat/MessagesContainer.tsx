@@ -1,16 +1,17 @@
 import {
-  Grid, IconButton, styled, TextField,
+  Grid, IconButton, styled, TextField, Typography,
 } from '@mui/material';
 import React, { MutableRefObject } from 'react';
 import SendIcon from '@mui/icons-material/Send';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
 import TranslateIcon from '@mui/icons-material/Translate';
+import CallIcon from '@mui/icons-material/Call';
 import { useChat } from '../../context/ChatContext';
 import useAuth from '../../customHooks/useAuth';
 import { IChat, IMessage } from '../../config/types';
 import events from '../../config/events';
 import Message from './Message';
 import yt from '../../utils/translator';
+import AttachmentMenuBtn from './AttachmentMenuBtn';
 
 interface IMessagesContainer {
   xs: number
@@ -18,7 +19,7 @@ interface IMessagesContainer {
 
 const StyledMessagesGridContainer = styled(Grid)({
   overflowY: 'auto',
-  height: 'calc(100vh - 280px)',
+  height: 'calc(100vh - 320px)',
   paddingBottom: 6,
   paddingRight: 6,
   '&::-webkit-scrollbar': {
@@ -57,6 +58,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
       // can't translate white space
       if (!String(msgText).trim()) return;
 
+      // translating the text in the input field
       newMessageRef.current.value = await yt(msgText, 'en', 'ru');
     }
   };
@@ -114,12 +116,37 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
       direction='column'
       wrap='nowrap'
       justifyContent='flex-end'
-      sx={{ p: 1 }}
-      style={{
-        borderRadius: 2,
-        position: 'relative',
-      }}
+      sx={{ p: 0.5 }}
+      style={{ border: '1px solid grey', borderRadius: '5px' }}
     >
+      {/* Top bar */}
+      <Grid
+        item
+        container
+        justifyContent='center'
+        alignItems='center'
+        direction='row'
+        sx={{ pt: 1, pb: 1 }}
+        style={{
+          backgroundColor: '#fafbfc',
+          borderBottom: '0.5px solid #909090',
+          zIndex: 1,
+        }}
+      >
+        <Grid item sx={{ pr: 5 }}>
+          <Typography
+            variant='subtitle1'
+            sx={{ fontWeight: 'medium', fontSize: 'h6.fontSize' }}
+          >
+            {currentChat.participantUsername}
+          </Typography>
+        </Grid>
+        <Grid item sx={{ pl: 5 }}>
+          <IconButton aria-label='call-button' size='large'>
+            <CallIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
       {/* Messages */}
       <StyledMessagesGridContainer
         item
@@ -149,6 +176,8 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
         style={{
           backgroundColor: '#fafbfc',
           height: '80px',
+          borderTop: '0.5px solid #909090',
+          zIndex: 1,
         }}
         spacing={0.5}
       >
@@ -159,9 +188,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
           justifyContent='center'
           alignItems='center'
         >
-          <IconButton aria-label='attach-icon-btn' size='large'>
-            <AttachFileIcon />
-          </IconButton>
+          <AttachmentMenuBtn />
         </Grid>
         <Grid
           item
@@ -189,6 +216,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
             style={{
               backgroundColor: 'white',
             }}
+            maxRows={5}
           />
         </Grid>
         <Grid

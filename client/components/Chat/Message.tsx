@@ -19,7 +19,7 @@ const StyledTypography = (
       borderRadius: '10px',
       backgroundColor: self ? '#eceff1' : '#1eb4ff',
       color: self ? 'black' : 'white',
-      maxWidth: '400px',
+      maxWidth: '300px',
     }}
     paragraph
     ref={innerRef}
@@ -33,12 +33,15 @@ const StyledMessage = (
     children,
     self,
     handleContextMenu,
+    handleDblClick,
   }:
     {
       children: React.ReactNode,
       self: boolean,
       // eslint-disable-next-line no-unused-vars
       handleContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+      // eslint-disable-next-line no-unused-vars
+      handleDblClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
     },
 ) => (
   <div
@@ -48,6 +51,7 @@ const StyledMessage = (
       alignItems: self ? 'flex-end' : 'flex-start',
     }}
     onContextMenu={handleContextMenu}
+    onDoubleClick={handleDblClick}
   >
     {children}
   </div>
@@ -55,8 +59,8 @@ const StyledMessage = (
 
 const Message = ({ msgProps, self }: IMessageComponent) => {
   const textRef: React.MutableRefObject<HTMLParagraphElement | null> = React.useRef(null);
-  const [eng, setEng] = React.useState(true); // is message in english
 
+  const [eng, setEng] = React.useState(true); // is message in english
   const handleContextMenu = async () => {
     if (textRef.current !== null) {
       // changing the language
@@ -70,8 +74,17 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
     }
   };
 
+  const [showTime, setShowTime] = React.useState(false);
+  const handleDblClick = () => {
+    setShowTime((b) => !b);
+  };
+
   return (
-    <StyledMessage self={self} handleContextMenu={handleContextMenu}>
+    <StyledMessage
+      self={self}
+      handleContextMenu={handleContextMenu}
+      handleDblClick={handleDblClick}
+    >
       <div style={{ display: 'flex', marginBottom: '-12px' }}>
         {/*
       <img
@@ -82,14 +95,17 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
       */}
         <StyledTypography self={self} innerRef={textRef}>{msgProps.text}</StyledTypography>
       </div>
-      <Typography
-        variant='body2'
-        style={{
-          fontSize: '12px',
-        }}
-      >
-        {format(msgProps.sentAt)}
-      </Typography>
+      {showTime
+      && (
+        <Typography
+          variant='body2'
+          style={{
+            fontSize: '12px',
+          }}
+        >
+          {format(msgProps.sentAt)}
+        </Typography>
+      )}
     </StyledMessage>
   );
 };
