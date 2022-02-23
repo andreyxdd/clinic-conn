@@ -61,7 +61,8 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
   const textRef: React.MutableRefObject<HTMLParagraphElement | null> = React.useRef(null);
 
   const [eng, setEng] = React.useState(true); // is message in english
-  const handleContextMenu = async () => {
+  const handleContextMenu = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
     if (textRef.current !== null) {
       // changing the language
       setEng((b: boolean) => !b);

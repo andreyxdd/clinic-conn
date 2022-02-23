@@ -1,5 +1,5 @@
-// import { nanoid } from 'nanoid';
 import { Server, Socket } from 'socket.io';
+import Message from '../entities/Message';
 import { IMessage } from '../config/types';
 import { getUserChatsViaSockets } from '../controllers/chatControllers';
 import logger from '../utils/log';
@@ -18,16 +18,6 @@ const EVENTS = {
     USER_CHATS: 'USER_CHATS',
   },
 };
-
-/*
-interface IRoomMessage {
-  roomId: string;
-  message: string;
-  username: string;
-}
-*/
-
-// const rooms: Record<string, { name: string }> = {};
 
 function chatSocket({ io }: { io: Server }) {
   logger.info('Chat Sockets enabled');
@@ -53,7 +43,7 @@ function chatSocket({ io }: { io: Server }) {
 
     logger.info(`User connected: \n - Socket id: ${socket.id} \n - Username: ${username} \n - User Id: ${userId}`);
 
-    // getting all the chats related to the user
+    // -- getting all the chats related to the user
     const userChats = await getUserChatsViaSockets(userId, username);
 
     // creating and joining all the chat-rooms related to the given user
@@ -63,13 +53,22 @@ function chatSocket({ io }: { io: Server }) {
 
     // sending the array back
     socket.emit(EVENTS.SERVER.USER_CHATS, userChats);
+    // --
 
     // handling message sent from the client
     socket.on(EVENTS.CLIENT.SEND_MESSAGE, async (
-      { content, to }: {content: IMessage, to: string},
+      { content, chatId }: {content: IMessage, chatId: number},
     ) => {
-      // 'to' is a chatId
-      socket.to(to).emit(EVENTS.SERVER.CHAT_MESSAGE, content);
+      const { sentAt, text } = content;
+      await Message.insert({
+        userId,
+        chatId,
+        text,
+        sentAt,
+      });
+
+      // 'to' is a room id (eg 'chatId-1')
+      socket.to(`chat-${chatId}`).emit(EVENTS.SERVER.CHAT_MESSAGE, content);
     });
 
     // disconnecting
@@ -77,58 +76,6 @@ function chatSocket({ io }: { io: Server }) {
       logger.info(`User disconnected: \n - Socket id: ${socket.id} \n - Username: ${username} \n - User Id: ${userId}`);
     });
   });
-
-  /* OLD
-  io.on(EVENTS.connection, (socket: Socket) => {
-    logger.info(`User connected ${socket.id}`);
-
-    // -- User creates a new room
-    socket.on(EVENTS.CLIENT.CREATE_ROOM, (roomName: string) => {
-      logger.info(roomName);
-
-      // create a roomId
-      const roomId = nanoid();
-
-      // add a new room to the rooms object
-      rooms[roomId] = {
-        name: roomName,
-      };
-
-      // join room
-      socket.join(roomId);
-
-      // broadcast an event saying there is a new room
-      // broadcast evebt on for all sockets but the one broadcasting
-      socket.broadcast.emit(EVENTS.SERVER.ROOMS, rooms);
-
-      // emit back to the room creator with all the rooms
-      socket.emit(EVENTS.SERVER.ROOMS, rooms);
-
-      // emit event back the room creator saying they have joined a room
-      socket.emit(EVENTS.SERVER.JOINED_ROOM, roomId);
-    });
-    // --
-
-    // -- User sends a message (in a given room)
-    socket.on(EVENTS.CLIENT.SEND_ROOM_MESSAGE, ({ roomId, message, username } : IRoomMessage) => {
-      const date = new Date();
-
-      socket.to(roomId).emit(EVENTS.SERVER.ROOM_MESSAGE, {
-        message, username, time: `${date.getHours()}:${date.getMinutes()}`,
-      });
-    });
-    // --
-
-    // -- User joins the room
-    socket.on(EVENTS.CLIENT.JOIN_ROOM, (roomId : string) => {
-      socket.join(roomId);
-
-      // emit event back the room creator saying they have joined a room
-      socket.emit(EVENTS.SERVER.JOINED_ROOM, roomId);
-    });
-    // --
-  });
-  */
 }
 
 export default chatSocket;

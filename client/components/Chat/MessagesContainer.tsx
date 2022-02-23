@@ -80,7 +80,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
 
       socket!.emit(events.CLIENT.SEND_MESSAGE, {
         content,
-        to: `chat-${currentChat?.chatId}`,
+        chatId: currentChat?.chatId,
       });
 
       // updating current chat
@@ -179,7 +179,6 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
           borderTop: '0.5px solid #909090',
           zIndex: 1,
         }}
-        spacing={0.5}
       >
         <Grid
           item
