@@ -1,5 +1,5 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
+  Entity, Column, PrimaryColumn,
   BaseEntity, UpdateDateColumn, CreateDateColumn, OneToMany,
 } from 'typeorm';
 import UserVerification from './UserVerification';
@@ -8,7 +8,7 @@ import Message from './Message';
 
 @Entity({ name: 'User' })
 class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
     id: number;
 
   @Column()

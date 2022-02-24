@@ -17,7 +17,6 @@ export const corsSocketOptions = {
   origin: process.env.CLIENT_SIDE_URL,
   credentials: true,
   methods: ['GET', 'POST'],
-
 };
 
 export const isProduction = process.env.NODE_ENV === 'production';

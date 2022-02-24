@@ -10,7 +10,7 @@ import {
 } from '../utils/auth';
 import { timeToUpdateRefreshToken } from '../config/index';
 import { sendConfirmation } from '../utils/email';
-// import logger from '../utils/logUtils';
+import logger from '../utils/log';
 
 //--
 
@@ -85,8 +85,18 @@ export const register = async (req: Request, res: Response) => {
       birthday,
     } = req.body;
 
+    const users = await User.find(
+      { order: { id: 'DESC' } },
+    );
+
+    const lastUser = users[0];
+    logger.info(lastUser);
+
+    if (!lastUser) throw new Error('Can\'t find last user');
+
     // inserting new user
-    const { identifiers } = await User.insert({
+    await User.insert({
+      id: lastUser.id + 1,
       username,
       email,
       password: await hash(password, 12),
@@ -94,25 +104,30 @@ export const register = async (req: Request, res: Response) => {
       lastName,
       birthday,
     });
-    const { id } = identifiers[0];
 
+    // TODO: correct typeorm issue (?)
     // creating verification token
-    const emailToken = createConfirmationToken(id);
+    const emailToken = createConfirmationToken(lastUser.id + 1);
 
     // inserting new user verification record
-    UserVerification.insert({
-      userId: id,
+    await UserVerification.insert({
+      userId: lastUser.id + 1,
       emailToken,
     });
 
     // generating confirmation link
     const confirmationLink = `http://${req.headers.host}/api/auth/confirmation/${emailToken}`;
 
+    logger.info(confirmationLink);
+
     // emailing user
-    sendConfirmation(email, username, confirmationLink);
+    await sendConfirmation(email, username, confirmationLink);
+
+    logger.info(confirmationLink);
 
     return res.status(200).send();
   } catch (e) {
+    logger.info(e);
     return res.status(500).send();
   }
 };

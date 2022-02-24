@@ -31,15 +31,6 @@ require('dotenv').config();
   const PORT = process.env.PORT || 4000;
   const app = express();
 
-  // needed later for socket.io:
-  const httpServer = createServer(app);
-
-  // -- initiate socket connections
-  const io = new Server(httpServer, {
-    cors: corsSocketOptions,
-  });
-  // --
-
   // -- Global Middlewares:
   // Enable CORS (Access-Control-Allow-Origin: only from the client!)
   app.use(cors(corsOptions));
@@ -112,6 +103,13 @@ require('dotenv').config();
 
   // -- db
   await createConnection();
+  // --
+
+  // -- initiate socket connections
+  const httpServer = createServer(app);
+  const io = new Server(httpServer, {
+    cors: corsSocketOptions,
+  });
   // --
 
   // -- listening
