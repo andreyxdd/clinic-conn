@@ -52,6 +52,7 @@ const Layout: React.FC<ILayoutProps> = ({ children }) => {
         <div style={{
           marginTop: 90,
           flexGrow: 1,
+          marginBottom: 50,
         }}
         >
           {children}
