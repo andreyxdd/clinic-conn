@@ -6,21 +6,26 @@ import logger from '../utils/log';
 
 const EVENTS = {
   connection: 'connection',
+  connection_error: 'connection_error',
+  disconnect: 'disconnect',
   CLIENT: {
-    CREATE_ROOM: 'CREATE_ROOM',
     SEND_MESSAGE: 'SEND_MESSAGE',
-    JOIN_ROOM: 'JOIN_ROOM',
+    CALL: 'CALL',
+    ANSWER_CALL: 'ANSWER_CALL',
+    PEER: {
+      SIGNAL: 'signal',
+    },
   },
   SERVER: {
-    ROOMS: 'ROOMS',
-    JOINED_ROOM: 'JOINED_ROOM',
+    CALL: 'CALL',
+    CALL_ACCEPTED: 'CALL_ACCEPTED',
     CHAT_MESSAGE: 'CHAT_MESSAGE',
     USER_CHATS: 'USER_CHATS',
   },
 };
 
-function chatSocket({ io }: { io: Server }) {
-  logger.info('Chat Sockets enabled');
+function setSocket({ io }: { io: Server }) {
+  logger.info('Text-messaging Sockets enabled');
 
   // -- socket middleware
   // user verification
@@ -71,11 +76,27 @@ function chatSocket({ io }: { io: Server }) {
       socket.to(`chat-${chatId}`).emit(EVENTS.SERVER.CHAT_MESSAGE, content);
     });
 
-    // disconnecting
-    socket.on('disconnect', () => {
+    // -- disconnecting
+    socket.on(EVENTS.disconnect, () => {
+      socket.broadcast.emit('callEnded');
       logger.info(`User disconnected: \n - Socket id: ${socket.id} \n - Username: ${username} \n - User Id: ${userId}`);
+    });
+    // --
+
+    // -- video call handling
+    socket.on(EVENTS.CLIENT.CALL, (data) => {
+      const callId = `call-${data.callFromUsername}_${data.callToUsername}`;
+      io.to(callId).emit(EVENTS.SERVER.CALL, {
+        signal: data.signal,
+        callToUsername: data.callToUsername,
+        callFromUsername: data.callFromUsername,
+      });
+    });
+
+    socket.on(EVENTS.CLIENT.ANSWER_CALL, (data) => {
+      io.to(data.callId).emit('callAccepted', data.signal);
     });
   });
 }
 
-export default chatSocket;
+export default setSocket;

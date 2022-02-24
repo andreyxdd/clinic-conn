@@ -1,5 +1,5 @@
 import {
-  Grid, IconButton, styled, TextField, Typography,
+  Grid, IconButton, styled, TextField, Typography, Chip,
 } from '@mui/material';
 import React, { MutableRefObject } from 'react';
 import SendIcon from '@mui/icons-material/Send';
@@ -12,6 +12,7 @@ import events from '../../config/events';
 import Message from './Message';
 import yt from '../../utils/translator';
 import AttachmentMenuBtn from './AttachmentMenuBtn';
+import VideoCallModal from './VideoCallModal';
 
 interface IMessagesContainer {
   xs: number
@@ -41,7 +42,7 @@ const StyledMessagesGridContainer = styled(Grid)({
 
 const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   const {
-    currentChat, setCurrentChat, setChats, socket,
+    currentChat, setCurrentChat, setChats, socket, setOpenVideoCallModal,
   } = useChat();
   const { user } = useAuth();
   const newMessageRef: MutableRefObject<HTMLTextAreaElement | null> = React.useRef(null);
@@ -105,6 +106,12 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
     }
   };
 
+  // -- video call interface
+  const handleVideoModalOpened = () => {
+    setOpenVideoCallModal(true);
+  };
+  // --
+
   if (!currentChat) {
     return (
       <Grid
@@ -143,128 +150,133 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   }
 
   return (
-    <Grid
-      item
-      xs={xs}
-      container
-      direction='column'
-      wrap='nowrap'
-      justifyContent='flex-end'
-      sx={{ p: 0.5 }}
-      style={{ border: '1px solid grey', borderRadius: '5px' }}
-    >
-      {/* Top bar */}
+    <>
+      <VideoCallModal />
       <Grid
         item
+        xs={xs}
         container
-        justifyContent='center'
-        alignItems='center'
-        direction='row'
-        sx={{ pt: 1, pb: 1 }}
-        style={{
-          backgroundColor: '#fafbfc',
-          borderBottom: '0.5px solid #909090',
-          zIndex: 1,
-        }}
-      >
-        <Grid item sx={{ pr: 5 }}>
-          <Typography
-            variant='subtitle1'
-            sx={{ fontWeight: 'medium', fontSize: 'h6.fontSize' }}
-          >
-            {currentChat.participantUsername}
-          </Typography>
-        </Grid>
-        <Grid item sx={{ pl: 5 }}>
-          <IconButton aria-label='call-button' size='large'>
-            <CallIcon />
-          </IconButton>
-        </Grid>
-      </Grid>
-      {/* Messages */}
-      <StyledMessagesGridContainer
-        item
-        container
-        direction='column-reverse'
+        direction='column'
         wrap='nowrap'
+        justifyContent='flex-end'
+        sx={{ p: 0.5 }}
+        style={{ border: '1px solid grey', borderRadius: '5px' }}
       >
-        <div ref={messageEndRef} />
-        {
-          currentChat.messages.slice().reverse().map((msgProps: IMessage) => {
-            if (msgProps.username === user.username) {
-              return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self />;
-            }
-            return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self={false} />;
-          })
-        }
-      </StyledMessagesGridContainer>
-      {/* Text area and buttons */}
-      <Grid
-        item
-        container
-        justifyContent='space-evenly'
-        direction='row'
-        sx={{
-          pb: 10, pt: 3,
-        }}
-        style={{
-          backgroundColor: '#fafbfc',
-          height: '80px',
-          borderTop: '0.5px solid #909090',
-          zIndex: 1,
-        }}
-      >
+        {/* Top bar */}
         <Grid
           item
-          xs={0.5}
           container
           justifyContent='center'
           alignItems='center'
+          direction='row'
+          sx={{ pt: 1, pb: 1 }}
+          style={{
+            backgroundColor: '#fafbfc',
+            borderBottom: '0.5px solid #909090',
+            zIndex: 1,
+          }}
         >
-          <AttachmentMenuBtn />
+          <Grid item sx={{ pr: 5 }}>
+            <Typography
+              variant='subtitle1'
+              sx={{ fontWeight: 'medium', fontSize: 'h6.fontSize' }}
+            >
+              {currentChat.participantUsername}
+            </Typography>
+          </Grid>
+          <Grid item sx={{ pl: 5 }}>
+            <Chip
+              icon={<CallIcon />}
+              label='Initiate Call'
+              onClick={handleVideoModalOpened}
+            />
+          </Grid>
         </Grid>
+        {/* Messages */}
+        <StyledMessagesGridContainer
+          item
+          container
+          direction='column-reverse'
+          wrap='nowrap'
+        >
+          <div ref={messageEndRef} />
+          {
+            currentChat.messages.slice().reverse().map((msgProps: IMessage) => {
+              if (msgProps.username === user.username) {
+                return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self />;
+              }
+              return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self={false} />;
+            })
+          }
+        </StyledMessagesGridContainer>
+        {/* Text area and buttons */}
         <Grid
           item
-          xs={0.5}
           container
-          justifyContent='center'
-          alignItems='center'
+          justifyContent='space-evenly'
+          direction='row'
+          sx={{
+            pb: 10, pt: 3,
+          }}
+          style={{
+            backgroundColor: '#fafbfc',
+            height: '80px',
+            borderTop: '0.5px solid #909090',
+            zIndex: 1,
+          }}
         >
-          <IconButton onClick={handleTranslate} aria-label='translate-icon-btn' size='large'>
-            <TranslateIcon />
-          </IconButton>
-        </Grid>
-        <Grid
-          item
-          xs={9.5}
-          container
-          justifyContent='center'
-          alignItems='center'
-        >
-          <TextField
-            inputRef={newMessageRef}
-            placeholder='Write message...'
-            fullWidth
-            multiline
-            style={{
-              backgroundColor: 'white',
-            }}
-            maxRows={5}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={0.5}
-          container
-          justifyContent='center'
-          alignItems='center'
-        >
-          <IconButton onClick={handleSendMessages} aria-label='send-icon-btn' size='large'>
-            <SendIcon />
-          </IconButton>
+          <Grid
+            item
+            xs={0.5}
+            container
+            justifyContent='center'
+            alignItems='center'
+          >
+            <AttachmentMenuBtn />
+          </Grid>
+          <Grid
+            item
+            xs={0.5}
+            container
+            justifyContent='center'
+            alignItems='center'
+          >
+            <IconButton onClick={handleTranslate} aria-label='translate-icon-btn' size='large'>
+              <TranslateIcon />
+            </IconButton>
+          </Grid>
+          <Grid
+            item
+            xs={9.5}
+            container
+            justifyContent='center'
+            alignItems='center'
+          >
+            <TextField
+              inputRef={newMessageRef}
+              placeholder='Write message...'
+              fullWidth
+              multiline
+              style={{
+                backgroundColor: 'white',
+              }}
+              maxRows={5}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={0.5}
+            container
+            justifyContent='center'
+            alignItems='center'
+          >
+            <IconButton onClick={handleSendMessages} aria-label='send-icon-btn' size='large'>
+              <SendIcon />
+            </IconButton>
+          </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

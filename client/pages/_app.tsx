@@ -49,11 +49,11 @@ const App = (props: IAppProps) => {
             <CacheProvider value={emotionCache}>
               <Head>
                 <title>WorldMedExpo</title>
-                {/*
-          <link
-            rel='icon'
-            href='https://img.icons8.com/color/48/000000/diamond.png'
-          /> */}
+                <link
+                  rel='icon'
+                  // eslint-disable-next-line max-len
+                  href='https://img.icons8.com/external-xnimrodx-blue-xnimrodx/64/000000/external-medicine-virus-xnimrodx-blue-xnimrodx.png'
+                />
                 <meta name='viewport' content='initial-scale=1, width=device-width' />
               </Head>
               <ThemeProvider theme={theme}>

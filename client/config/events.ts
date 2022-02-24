@@ -2,13 +2,17 @@ const EVENTS = {
   connection: 'connection',
   connection_error: 'connection_error',
   CLIENT: {
-    CREATE_ROOM: 'CREATE_ROOM',
     SEND_MESSAGE: 'SEND_MESSAGE',
-    JOIN_ROOM: 'JOIN_ROOM',
+    CALL: 'CALL',
+    ANSWER_CALL: 'ANSWER_CALL',
+    PEER: {
+      SIGNAL: 'signal',
+      STREAM: 'stream',
+    },
   },
   SERVER: {
-    ROOMS: 'ROOMS',
-    JOINED_ROOM: 'JOINED_ROOM',
+    CALL: 'CALL',
+    CALL_ACCEPTED: 'CALL_ACCEPTED',
     CHAT_MESSAGE: 'CHAT_MESSAGE',
     USER_CHATS: 'USER_CHATS',
   },

@@ -1,10 +1,11 @@
 import {
-  useState, createContext, useContext, useEffect,
+  useState, createContext, useContext,
+  useEffect, useRef, MutableRefObject,
 } from 'react';
 import { io, Socket } from 'socket.io-client';
-// import { fetcher } from '../lib/auth/csr';
+import Peer from 'simple-peer';
 import env from '../config/env';
-import { IChat, IMessage } from '../config/types';
+import { IChat, IMessage, ICall } from '../config/types';
 import useAuth from '../customHooks/useAuth';
 import events from '../config/events';
 
@@ -14,6 +15,17 @@ interface IChatContext{
   setCurrentChat: Function;
   chats: Array<IChat>;
   setChats: Function;
+  call: ICall | null;
+  stream: MediaStream | undefined;
+  callAccepted: boolean;
+  callEnded: boolean;
+  userVideoRef: MutableRefObject<HTMLVideoElement | null>;
+  oppositeUserVideoRef: MutableRefObject<HTMLVideoElement | null>;
+  answerCall: Function;
+  makeCall: Function;
+  stopCall: Function;
+  openVideoCallModal: boolean;
+  setOpenVideoCallModal: Function;
 }
 
 const ChatContext = createContext<IChatContext | null>(null);
@@ -61,7 +73,7 @@ const ChatProvider = ({ children }: IChatProvider) => {
   }, [user, socket]);
   // --
 
-  // -- Handle Client Socket Object
+  // -- Handle text-messaging socket events
   useEffect(() => {
     if (!socket) return;
 
@@ -106,11 +118,161 @@ const ChatProvider = ({ children }: IChatProvider) => {
   }, [socket]);
   // --
 
+  // -- Handle video-call socket events
+  const [callAccepted, setCallAccepted] = useState(false);
+  const [callEnded, setCallEnded] = useState(false);
+  const [call, setCall] = useState<ICall | null>(null);
+  const [stream, setStream] = useState<MediaStream | undefined>();
+  const [openVideoCallModal, setOpenVideoCallModal] = useState(false);
+
+  const userVideoRef: MutableRefObject<HTMLVideoElement | null> = useRef(null);
+  const oppositeUserVideoRef: MutableRefObject<HTMLVideoElement | null> = useRef(null);
+  const connectionRef: MutableRefObject<Peer.Instance | null> = useRef(null);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(events.SERVER.CALL, (
+      { signal, callToUsername, callFromUsername },
+    ) => {
+      setCall({
+        isReceivingCall: true,
+        signal,
+        callToUsername,
+        callFromUsername,
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!navigator) return;
+
+    if (openVideoCallModal) {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then((currentStream) => {
+          setStream(currentStream);
+
+          if (userVideoRef.current !== null) {
+            userVideoRef.current.srcObject = currentStream;
+          } else {
+            console.log('Failed setting current stream');
+          }
+        });
+    } else {
+      setStream((currStream) => {
+        currStream?.getTracks().forEach((track) => {
+          if (track.readyState === 'live') {
+            if (track.enabled) {
+              track.stop();
+              // eslint-disable-next-line no-param-reassign
+              track.enabled = false;
+            }
+          }
+        });
+        return undefined;
+      });
+    }
+  }, [openVideoCallModal]);
+
+  const answerCall = () => {
+    if (!socket) {
+      console.log(`Socket object is ${socket}`);
+      return;
+    }
+
+    if (!call) {
+      console.log(`Call object is ${call}`);
+      return;
+    }
+
+    setCallAccepted(true);
+
+    const peer = new Peer({ initiator: false, trickle: false, stream });
+
+    peer.on(events.CLIENT.PEER.SIGNAL, (data) => {
+      socket.emit(events.CLIENT.ANSWER_CALL,
+        {
+          signal: data,
+          callId: `call-${call.callFromUsername}_${call.callToUsername}`,
+        });
+    });
+
+    peer.on(events.CLIENT.PEER.STREAM, (currentStream) => {
+      if (userVideoRef.current !== null) {
+        userVideoRef.current.srcObject = currentStream;
+      } else {
+        console.log('Failed setting current stream when answering a call');
+      }
+    });
+
+    peer.signal(call.signal);
+
+    connectionRef.current = peer;
+  };
+
+  const makeCall = (chat: IChat) => {
+    if (!socket) {
+      console.log(`Socket object is ${socket}`);
+      return;
+    }
+
+    const peer = new Peer({ initiator: true, trickle: false, stream });
+
+    peer.on(events.CLIENT.PEER.SIGNAL, (data) => {
+      socket.emit(events.CLIENT.CALL, {
+        callToUsername: chat.participantUsername,
+        callFromUsername: user?.username,
+        signal: data,
+      });
+    });
+
+    peer.on(events.CLIENT.PEER.STREAM, (currentStream) => {
+      if (oppositeUserVideoRef.current !== null) {
+        oppositeUserVideoRef.current.srcObject = currentStream;
+      } else {
+        console.log('Failed setting current stream of the opposite user');
+      }
+    });
+
+    socket.on(events.SERVER.CALL_ACCEPTED, (signal) => {
+      setCallAccepted(true);
+      peer.signal(signal);
+    });
+
+    connectionRef.current = peer;
+  };
+
+  const stopCall = () => {
+    setCallEnded(true);
+
+    if (connectionRef.current) {
+      connectionRef.current.destroy();
+    } else {
+      console.log('Failed to destory connection');
+    }
+  };
+  // --
+
   if (!socket) return <></>;
 
   return (
     <ChatContext.Provider value={{
-      socket, currentChat, setCurrentChat, chats, setChats,
+      socket,
+      currentChat,
+      setCurrentChat,
+      chats,
+      setChats,
+      call,
+      stream,
+      callAccepted,
+      callEnded,
+      userVideoRef,
+      oppositeUserVideoRef,
+      answerCall,
+      makeCall,
+      stopCall,
+      openVideoCallModal,
+      setOpenVideoCallModal,
     }}
     >
       {children}

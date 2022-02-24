@@ -50,3 +50,10 @@ export interface IChat{
   messages: Array<IMessage>
   participantUsername: string;
 }
+
+export interface ICall{
+  isReceivingCall: boolean;
+  callToUsername: string;
+  callFromUsername: string;
+  signal: any; // TODO: consider determining the actual type
+}

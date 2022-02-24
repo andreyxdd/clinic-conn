@@ -18,13 +18,12 @@ import logger from './utils/log';
 import { default as authRouter } from './routes/authRoutes';
 import { default as userRouter } from './routes/userRoutes';
 import { default as chatRouter } from './routes/chatRoutes';
-import { corsOptions } from './config/index';
+import { corsOptions, corsSocketOptions } from './config/index';
 import User from './entities/User';
 import Message from './entities/Message';
 
 // Sockets
-// import videoSocket from './sockets/videoSocket';
-import chatSocket from './sockets/chatSocket';
+import setSocket from './ws/socket';
 
 require('dotenv').config();
 
@@ -35,24 +34,11 @@ require('dotenv').config();
   // needed later for socket.io:
   const httpServer = createServer(app);
 
-  // initiate socket connection
-  /*
-  const ioVideo = new Server(httpServer, {
-    cors: {
-      origin: process.env.CLIENT_SIDE_URL!,
-      credentials: true,
-      methods: ['GET', 'POST'],
-    },
+  // -- initiate socket connections
+  const io = new Server(httpServer, {
+    cors: corsSocketOptions,
   });
-  */
-
-  const ioChat = new Server(httpServer, {
-    cors: {
-      origin: process.env.CLIENT_SIDE_URL!,
-      credentials: true,
-      methods: ['GET', 'POST'],
-    },
-  });
+  // --
 
   // -- Global Middlewares:
   // Enable CORS (Access-Control-Allow-Origin: only from the client!)
@@ -85,11 +71,6 @@ require('dotenv').config();
     windowMs: 60 * 60 * 100,
     message: 'Too many requests! Please try again in an hour!',
   });
-
-  // TODO: consider using development Logs
-  if (process.env.NODE_ENV === 'development') {
-    // app.use(morgan('dev'));
-  }
 
   // Compress the responses
   app.use(compression());
@@ -137,8 +118,7 @@ require('dotenv').config();
   httpServer.listen(PORT, () => {
     logger.info(`Server running on port: ${PORT}`);
 
-    chatSocket({ io: ioChat });
-    // videoSocket({ io: ioVideo });
+    setSocket({ io });
   });
   //--
 })();

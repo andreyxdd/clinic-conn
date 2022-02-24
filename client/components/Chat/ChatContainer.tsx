@@ -59,19 +59,19 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
                 justifyContent='space-between'
                 alignItems='center'
               >
-                <Grid item>
-                  <Typography variant='subtitle1' noWrap sx={{ fontWeight: 'medium' }}>
+                <Grid item wrap='nowrap'>
+                  <Typography variant='subtitle1' sx={{ fontWeight: 'medium' }}>
                     {chatWithUsername}
                   </Typography>
                 </Grid>
-                <Grid item>
+                <Grid item wrap='nowrap'>
                   <Typography
                     variant='body2'
                     sx={{
                       position: 'relative',
                       fontWeight: 'light',
                     }}
-                    noWrap
+
                   >
                     {format(lastMsg.sentAt)}
                   </Typography>
