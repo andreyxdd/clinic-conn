@@ -25,7 +25,7 @@ const EVENTS = {
 };
 
 function setSocket({ io }: { io: Server }) {
-  logger.info('Text-messaging Sockets enabled');
+  logger.info('Sockets enabled');
 
   // -- socket middleware
   // user verification

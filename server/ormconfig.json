@@ -14,17 +14,17 @@
    "synchronize": true,
    "logging": false,
    "entities": [
-      "src/entities/**/*.ts"
+      "dist/src/entities/**/*.js"
    ],
    "migrations": [
-      "src/migrations/**/*.ts"
+      "dist/src/migrations/**/*.js"
    ],
    "subscribers": [
-      "src/subscribers/**/*.ts"
+      "dist/src/subscribers/**/*.js"
    ],
    "cli": {
-      "entitiesDir": "src/entities",
-      "migrationsDir": "src/migrations",
-      "subscribersDir": "src/subscribers"
+      "entitiesDir": "dist/src/entities",
+      "migrationsDir": "dist/src/migrations",
+      "subscribersDir": "dist/src/subscribers"
    }
 }

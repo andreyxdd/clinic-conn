@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare": "cd.. && husky install client/.husky",
+    "prepare-husky": "cd.. && husky install client/.husky",
     "check-types": "tsc --pretty --noEmit",
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "test-all": "npm run check-lint && npm run check-types && npm run build"
