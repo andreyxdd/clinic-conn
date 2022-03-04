@@ -3,6 +3,7 @@ const EVENTS = {
   connection_error: 'connection_error',
   CLIENT: {
     SEND_MESSAGE: 'SEND_MESSAGE',
+    READ_MESSAGE: 'READ_MESSAGE',
     CALL: 'CALL',
     ANSWER_CALL: 'ANSWER_CALL',
     PEER: {

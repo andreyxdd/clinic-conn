@@ -10,6 +10,7 @@ const EVENTS = {
   disconnect: 'disconnect',
   CLIENT: {
     SEND_MESSAGE: 'SEND_MESSAGE',
+    READ_MESSAGE: 'READ_MESSAGE',
     CALL: 'CALL',
     ANSWER_CALL: 'ANSWER_CALL',
     PEER: {
@@ -74,6 +75,18 @@ function setSocket({ io }: { io: Server }) {
 
       // 'to' is a room id (eg 'chatId-1')
       socket.to(`chat-${chatId}`).emit(EVENTS.SERVER.CHAT_MESSAGE, content);
+    });
+
+    // reading last unread message
+    socket.on(EVENTS.CLIENT.READ_MESSAGE, async ({ msgId }) => {
+      await Message.update(
+        {
+          id: msgId,
+        },
+        {
+          readAt: new Date(),
+        },
+      );
     });
 
     // -- disconnecting

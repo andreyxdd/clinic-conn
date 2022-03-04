@@ -1,6 +1,9 @@
 import React from 'react';
 import { format } from 'timeago.js';
-import { styled, Typography } from '@mui/material';
+import {
+  styled, Typography, Menu, MenuList, MenuItem,
+} from '@mui/material';
+
 import { IMessage } from '../../config/types';
 import yt from '../../utils/translator';
 
@@ -16,13 +19,14 @@ const StyledTypography = (
   <Typography
     style={{
       padding: '10px',
-      borderRadius: '10px',
+      borderRadius: self ? '10px 10px 0 10px' : '10px 10px 10px 0',
       backgroundColor: self ? '#eceff1' : '#1eb4ff',
       color: self ? 'black' : 'white',
       maxWidth: '300px',
     }}
     paragraph
     ref={innerRef}
+    component='div'
   >
     {children}
   </Typography>
@@ -36,39 +40,26 @@ const StyledDiv = styled('div')({
   },
 });
 
-const MessageContainer = (
-  {
-    children,
-    self,
-    handleContextMenu,
-    handleDblClick,
-  }:
-    {
-      children: React.ReactNode,
-      self: boolean,
-      // eslint-disable-next-line no-unused-vars
-      handleContextMenu: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-      // eslint-disable-next-line no-unused-vars
-      handleDblClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-    },
-) => (
-  <StyledDiv
-    style={{
-      alignItems: self ? 'flex-end' : 'flex-start',
-    }}
-    onContextMenu={handleContextMenu}
-    onDoubleClick={handleDblClick}
-  >
-    {children}
-  </StyledDiv>
-);
-
 const Message = ({ msgProps, self }: IMessageComponent) => {
   const textRef: React.MutableRefObject<HTMLParagraphElement | null> = React.useRef(null);
 
   const [eng, setEng] = React.useState(true); // is message in english
+
+  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
+  const open = Boolean(anchorEl);
+
   const handleContextMenu = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
+    setAnchorEl(e.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleItemSelection = async () => {
+    handleClose();
+
     if (textRef.current !== null) {
       // changing the language
       setEng((b: boolean) => !b);
@@ -81,39 +72,54 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
     }
   };
 
-  const [showTime, setShowTime] = React.useState(false);
-  const handleDblClick = () => {
-    setShowTime((b) => !b);
-  };
-
   return (
-    <MessageContainer
-      self={self}
-      handleContextMenu={handleContextMenu}
-      handleDblClick={handleDblClick}
-    >
-      <div style={{ display: 'flex', marginBottom: '-12px' }}>
-        {/*
-      <img
-        className='messageImg'
-        src='https://images.pexels.com/photos/3686769/pexels-photo-3686769.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500'
-        alt=''
-      />
-      */}
-        <StyledTypography self={self} innerRef={textRef}>{msgProps.text}</StyledTypography>
-      </div>
-      {showTime
-      && (
-        <Typography
-          variant='body2'
-          style={{
-            fontSize: '12px',
-          }}
+    <>
+      <StyledDiv
+        style={{
+          alignItems: self ? 'flex-end' : 'flex-start',
+        }}
+      >
+        <div
+          style={{ display: 'flex', marginBottom: '-12px' }}
+          onContextMenu={handleContextMenu}
         >
-          {format(msgProps.sentAt)}
-        </Typography>
-      )}
-    </MessageContainer>
+          <StyledTypography self={self} innerRef={textRef}>
+            {msgProps.text}
+            <Typography
+              variant='body2'
+              style={{
+                fontSize: '10px',
+                paddingTop: '4px',
+              }}
+            >
+              {format(msgProps.sentAt)}
+            </Typography>
+          </StyledTypography>
+        </div>
+      </StyledDiv>
+      <Menu
+        id='msg-ctx-menu'
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: self ? 'left' : 'right',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+      >
+        <MenuList dense>
+          <MenuItem onClick={handleItemSelection} disabled={!eng}>Translate to RUS</MenuItem>
+          <MenuItem onClick={handleItemSelection} disabled={!!eng}>Translate to ENG</MenuItem>
+        </MenuList>
+      </Menu>
+    </>
   );
 };
 

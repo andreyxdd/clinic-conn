@@ -42,6 +42,7 @@ export interface IMessage{
   username: string;
   text: string;
   sentAt: Date;
+  readAt: Date | null;
   id?: number;
 }
 

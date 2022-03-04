@@ -8,9 +8,6 @@ import Message from '../entities/Message';
 import UserChat from '../entities/UserChat';
 import logger from '../utils/log';
 
-// eslint-disable-next-line no-unused-vars
-export const dummy = async (_req: Request, _res: Response) => { };
-
 export const createChat = async (req: Request, res: Response) => {
   try {
     // -- finding users
@@ -159,7 +156,7 @@ export const getUserChatsViaSockets = async (userId: number, username: string) =
 
         const dbmessages = await Message.find({
           where: { chatId },
-          select: ['userId', 'text', 'sentAt', 'id'],
+          select: ['userId', 'text', 'sentAt', 'readAt', 'id'],
         });
 
         const messages = dbmessages.map(
@@ -167,6 +164,7 @@ export const getUserChatsViaSockets = async (userId: number, username: string) =
             username: msg.userId !== userId ? participantUsername : username,
             text: msg.text,
             sentAt: msg.sentAt,
+            readAt: msg.readAt,
             id: msg.id,
           }),
         );

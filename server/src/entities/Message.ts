@@ -35,6 +35,9 @@ class Message extends BaseEntity {
 
   @Column({ type: 'timestamp' })
     sentAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+    readAt: Date;
 }
 
 export default Message;

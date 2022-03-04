@@ -23,6 +23,8 @@ const StyledMessagesGridContainer = styled(Grid)({
   height: 'calc(100vh - 320px)',
   paddingBottom: 6,
   paddingRight: 6,
+  scrollbarWidth: 'thin',
+  scrollbarColor: '#888888 #B0B0B0',
   '&::-webkit-scrollbar': {
     width: '0.4vw',
     border: '4px solid transparent',
@@ -75,6 +77,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
         username: user!.username,
         text: msgText,
         sentAt: new Date(),
+        readAt: null,
       };
 
       if (!socket) return;
