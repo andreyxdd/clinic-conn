@@ -4,8 +4,7 @@ import {
 } from '@mui/material';
 import { format } from 'timeago.js';
 import { useChat } from '../../context/ChatContext';
-import { IChat, IMessage } from '../../config/types';
-import events from '../../config/events';
+import { IChat } from '../../config/types';
 import MessagesContainer from './MessagesContainer';
 
 interface IChatContainerProps { }
@@ -28,19 +27,25 @@ const ChatItem = styled(Grid)((
 
 const ChatContainer: React.FC<IChatContainerProps> = () => {
   const {
-    chats, currentChat, setCurrentChat, socket,
+    chats, setChats,
   } = useChat();
 
-  const handleChatClick = (chatToDisplay: IChat, lastMsg: IMessage, isUnread: boolean) => {
-    if (isUnread) {
-      socket.emit(events.CLIENT.READ_MESSAGE, { msgId: lastMsg.id });
-    }
-    setCurrentChat(chatToDisplay);
+  const handleChatClick = (chatToDisplay: IChat) => {
+    // updating chats array to indicate active chat
+    setChats((currChats: Array<IChat>) => {
+      const updatedChats = currChats.map((chat: IChat) => {
+        if (chat.chatId === chatToDisplay.chatId) {
+          return { ...chat, active: true };
+        }
+        return { ...chat, active: false };
+      });
+      return updatedChats;
+    });
   };
 
+  // sorting chats by last message datetime
   const sortedChats = React.useMemo(
     () => chats.sort((chatA: IChat, chatB: IChat) => {
-      console.log('here?');
       const [chatAlstMsg] = chatA.messages.slice(-1);
       const [chatBlstMsg] = chatB.messages.slice(-1);
 
@@ -55,8 +60,7 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
       }
       return 0;
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chats, currentChat],
+    [chats],
   );
 
   return (
@@ -81,10 +85,13 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
         {sortedChats.map((chat: IChat) => {
           const chatWithUsername = chat.participantUsername;
           const [lastMsg] = chat.messages.slice(-1);
-          let isUnread = false;
 
+          let isUnread = false;
           // msg is not from my self and it's not yet unread
-          if (lastMsg.username === chatWithUsername && lastMsg.readAt === null) {
+          if (lastMsg.username === chatWithUsername
+            && lastMsg.readAt === null
+            && !chat.active
+          ) {
             isUnread = true;
           }
 
@@ -92,8 +99,8 @@ const ChatContainer: React.FC<IChatContainerProps> = () => {
             <ChatItem
               item
               key={chat.chatId}
-              onClick={() => { handleChatClick(chat, lastMsg, isUnread); }}
-              selected={+(chat.chatId === currentChat?.chatId)}
+              onClick={() => { handleChatClick(chat); }}
+              selected={+(chat?.active || false)}
               unread={+isUnread}
             >
               <Grid

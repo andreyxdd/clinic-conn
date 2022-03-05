@@ -89,31 +89,21 @@ const ChatProvider = ({ children }: IChatProvider) => {
 
     // getting all the user chats
     socket.on(events.SERVER.USER_CHATS, (userChats: Array<IChat>) => {
+      userChats.map((obj: IChat) => ({ ...obj, active: false }));
       setChats(userChats);
     });
 
     // getting new messages
-    socket.on(events.SERVER.CHAT_MESSAGE, (content: IMessage, fromChat: number) => {
+    socket.on(events.SERVER.CHAT_MESSAGE, (content: IMessage, fromChatId: number) => {
       setChats((currChats) => {
         const updatedChats = currChats.map((chat) => {
-          if (chat.chatId === fromChat) {
+          if (chat.chatId === fromChatId) {
             return { ...chat, messages: [...chat.messages, content] };
           }
           return { ...chat };
         });
         return updatedChats;
       });
-
-      // if the chat is currently opened
-      if (currentChat?.chatId === fromChat) {
-        setCurrentChat((currChat: IChat | null) => {
-          if (!currChat) return null;
-          return ({
-            ...currChat,
-            messages: [...currChat.messages, content],
-          });
-        });
-      }
     });
   }, [socket]);
   // --

@@ -50,6 +50,7 @@ export interface IChat{
   chatId: number;
   messages: Array<IMessage>
   participantUsername: string;
+  active?: boolean;
 }
 
 export interface ICall{

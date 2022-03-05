@@ -7,6 +7,7 @@ import TranslateIcon from '@mui/icons-material/Translate';
 import CallIcon from '@mui/icons-material/Call';
 import { useChat } from '../../context/ChatContext';
 import useAuth from '../../customHooks/useAuth';
+import useInViewport from '../../customHooks/useInViewport';
 import { IChat, IMessage } from '../../config/types';
 import events from '../../config/events';
 import Message from './Message';
@@ -44,18 +45,59 @@ const StyledMessagesGridContainer = styled(Grid)({
 
 const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   const {
-    currentChat, setCurrentChat, setChats, socket, setOpenVideoCallModal,
+    setChats, socket, setOpenVideoCallModal, chats,
   } = useChat();
   const { user } = useAuth();
   const newMessageRef: MutableRefObject<HTMLTextAreaElement | null> = React.useRef(null);
-  const messageEndRef: MutableRefObject<HTMLDivElement | null> = React.useRef(null);
+  const messageEndRef: any = React.useRef<HTMLDivElement>();
+  const [activeChat, setActiveChat] = React.useState<IChat | null>(null);
 
   React.useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentChat]);
+    const oneActiveChat = chats.find((c) => c.active);
+    if (oneActiveChat) {
+      setActiveChat(oneActiveChat);
+      messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chats]);
+
+  // check if the last msg is in viewport
+  const msgInViewPort = useInViewport<HTMLDivElement>(messageEndRef, '0px');
+  React.useEffect(() => {
+    if (msgInViewPort && activeChat) {
+      const chatWithUsername = activeChat.participantUsername;
+      const [lastMsg] = activeChat.messages.slice(-1);
+
+      // msg is not from my self and it's not yet unread
+      if (lastMsg.username === chatWithUsername && lastMsg.readAt === null
+      ) {
+        setChats((currChats: Array<IChat>) => {
+          const updatedChats = currChats.map((chat: IChat) => {
+            if (chat.chatId === activeChat.chatId) {
+              const readAt = new Date();
+              socket.emit(
+                events.CLIENT.READ_MESSAGE,
+                { msgId: lastMsg.id, readAt },
+              );
+
+              const newChatMessages = [...chat.messages];
+
+              newChatMessages[newChatMessages.length - 1] = {
+                ...newChatMessages[newChatMessages.length - 1],
+                readAt,
+              };
+
+              return { ...chat, active: true, messages: newChatMessages };
+            }
+            return { ...chat };
+          });
+          return updatedChats;
+        });
+      }
+    }
+  }, [msgInViewPort]);
 
   const handleTranslate = async () => {
-    if (newMessageRef.current !== null && currentChat) {
+    if (newMessageRef.current !== null && activeChat) {
       const msgText = newMessageRef.current.value;
 
       // can't translate white space
@@ -67,7 +109,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   };
 
   const handleSendMessages = () => {
-    if (newMessageRef.current !== null && currentChat) {
+    if (newMessageRef.current !== null && activeChat) {
       const msgText = newMessageRef.current.value;
 
       // can't send white space
@@ -84,20 +126,13 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
 
       socket!.emit(events.CLIENT.SEND_MESSAGE, {
         content,
-        chatId: currentChat?.chatId,
+        chatId: activeChat?.chatId,
       });
 
-      // updating current chat
-      setCurrentChat((currChat: IChat) => ({
-        ...currChat,
-        messages: [...currChat.messages, content],
-      }));
-
       // updating chats array
-      // TODO: bad. there should be a better solution
       setChats((currChats: Array<IChat>) => {
         const updatedChats = currChats.map((chat: IChat) => {
-          if (chat.chatId === currentChat?.chatId) {
+          if (chat.chatId === activeChat?.chatId) {
             return { ...chat, messages: [...chat.messages, content] };
           }
           return { ...chat };
@@ -115,7 +150,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   };
   // --
 
-  if (!currentChat) {
+  if (!activeChat) {
     return (
       <Grid
         item
@@ -184,7 +219,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
               variant='subtitle1'
               sx={{ fontWeight: 'medium', fontSize: 'h6.fontSize' }}
             >
-              {currentChat.participantUsername}
+              {activeChat.participantUsername}
             </Typography>
           </Grid>
           <Grid item sx={{ pl: 5 }}>
@@ -204,7 +239,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
         >
           <div ref={messageEndRef} />
           {
-            currentChat.messages.slice().reverse().map((msgProps: IMessage) => {
+            activeChat.messages.slice().reverse().map((msgProps: IMessage) => {
               if (msgProps.username === user.username) {
                 return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self />;
               }

@@ -22,6 +22,7 @@ const EVENTS = {
     CALL_ACCEPTED: 'CALL_ACCEPTED',
     CHAT_MESSAGE: 'CHAT_MESSAGE',
     USER_CHATS: 'USER_CHATS',
+    READ_MESSAGE: 'READ_MESSAGE',
   },
 };
 
@@ -74,18 +75,14 @@ function setSocket({ io }: { io: Server }) {
       });
 
       // 'to' is a room id (eg 'chatId-1')
-      socket.to(`chat-${chatId}`).emit(EVENTS.SERVER.CHAT_MESSAGE, content);
+      socket.to(`chat-${chatId}`).emit(EVENTS.SERVER.CHAT_MESSAGE, content, chatId);
     });
 
     // reading last unread message
-    socket.on(EVENTS.CLIENT.READ_MESSAGE, async ({ msgId }) => {
+    socket.on(EVENTS.CLIENT.READ_MESSAGE, async ({ msgId, readAt }) => {
       await Message.update(
-        {
-          id: msgId,
-        },
-        {
-          readAt: new Date(),
-        },
+        { id: msgId },
+        { readAt },
       );
     });
 
