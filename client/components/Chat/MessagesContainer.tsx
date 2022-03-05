@@ -5,9 +5,9 @@ import React, { MutableRefObject } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import TranslateIcon from '@mui/icons-material/Translate';
 import CallIcon from '@mui/icons-material/Call';
+import useInView from 'react-cool-inview';
 import { useChat } from '../../context/ChatContext';
 import useAuth from '../../customHooks/useAuth';
-import useInViewport from '../../customHooks/useInViewport';
 import { IChat, IMessage } from '../../config/types';
 import events from '../../config/events';
 import Message from './Message';
@@ -49,7 +49,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   } = useChat();
   const { user } = useAuth();
   const newMessageRef: MutableRefObject<HTMLTextAreaElement | null> = React.useRef(null);
-  const messageEndRef: any = React.useRef<HTMLDivElement>();
+  const messageEndRef = React.useRef<HTMLDivElement>(null);
   const [activeChat, setActiveChat] = React.useState<IChat | null>(null);
 
   React.useEffect(() => {
@@ -61,40 +61,43 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   }, [chats]);
 
   // check if the last msg is in viewport
-  const msgInViewPort = useInViewport<HTMLDivElement>(messageEndRef, '0px');
-  React.useEffect(() => {
-    if (msgInViewPort && activeChat) {
-      const chatWithUsername = activeChat.participantUsername;
-      const [lastMsg] = activeChat.messages.slice(-1);
+  const { observe } = useInView({
+    threshold: 0.25, // Default is 0
+    onEnter: () => {
+      // Triggered when the target enters the viewport
+      if (activeChat) {
+        const chatWithUsername = activeChat.participantUsername;
+        const [lastMsg] = activeChat.messages.slice(-1);
 
-      // msg is not from my self and it's not yet unread
-      if (lastMsg.username === chatWithUsername && lastMsg.readAt === null
-      ) {
-        setChats((currChats: Array<IChat>) => {
-          const updatedChats = currChats.map((chat: IChat) => {
-            if (chat.chatId === activeChat.chatId) {
-              const readAt = new Date();
-              socket.emit(
-                events.CLIENT.READ_MESSAGE,
-                { msgId: lastMsg.id, readAt },
-              );
+        // msg is not from my self and it's not yet unread
+        if (lastMsg.username === chatWithUsername && lastMsg.readAt === null
+        ) {
+          setChats((currChats: Array<IChat>) => {
+            const updatedChats = currChats.map((chat: IChat) => {
+              if (chat.chatId === activeChat.chatId) {
+                const readAt = new Date();
+                socket.emit(
+                  events.CLIENT.READ_MESSAGE,
+                  { msgId: lastMsg.id, readAt },
+                );
 
-              const newChatMessages = [...chat.messages];
+                const newChatMessages = [...chat.messages];
 
-              newChatMessages[newChatMessages.length - 1] = {
-                ...newChatMessages[newChatMessages.length - 1],
-                readAt,
-              };
+                newChatMessages[newChatMessages.length - 1] = {
+                  ...newChatMessages[newChatMessages.length - 1],
+                  readAt,
+                };
 
-              return { ...chat, active: true, messages: newChatMessages };
-            }
-            return { ...chat };
+                return { ...chat, active: true, messages: newChatMessages };
+              }
+              return { ...chat };
+            });
+            return updatedChats;
           });
-          return updatedChats;
-        });
+        }
       }
-    }
-  }, [msgInViewPort]);
+    },
+  });
 
   const handleTranslate = async () => {
     if (newMessageRef.current !== null && activeChat) {
@@ -239,12 +242,28 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
         >
           <div ref={messageEndRef} />
           {
-            activeChat.messages.slice().reverse().map((msgProps: IMessage) => {
-              if (msgProps.username === user.username) {
-                return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self />;
-              }
-              return <Message key={`${msgProps.sentAt}`} msgProps={msgProps} self={false} />;
-            })
+            activeChat.messages.slice().reverse().map(
+              (msgProps: IMessage, idx: number) => {
+                if (msgProps.username === user.username) {
+                  return (
+                    <Message
+                      key={`${msgProps.sentAt}`}
+                      msgProps={msgProps}
+                      self
+                    />
+                  );
+                }
+                return (
+                  <div key={`${msgProps.sentAt}`}>
+                    {idx === 0 && <div id='last-message' ref={observe} />}
+                    <Message
+                      msgProps={msgProps}
+                      self={false}
+                    />
+                  </div>
+                );
+              },
+            )
           }
         </StyledMessagesGridContainer>
         {/* Text area and buttons */}
