@@ -48,9 +48,10 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null);
   const open = Boolean(anchorEl);
 
-  const handleContextMenu = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.preventDefault();
-    setAnchorEl(e.currentTarget);
+  const handleContextMenu = async (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button === 0) {
+      setAnchorEl(e.currentTarget);
+    }
   };
 
   const handleClose = () => {
@@ -80,22 +81,23 @@ const Message = ({ msgProps, self }: IMessageComponent) => {
         }}
       >
         <div
+          aria-hidden='true'
           style={{ display: 'flex', marginBottom: '-12px' }}
-          onContextMenu={handleContextMenu}
+          onMouseDown={handleContextMenu}
         >
           <StyledTypography self={self} innerRef={textRef}>
             {msgProps.text}
-            <Typography
-              variant='body2'
-              style={{
-                fontSize: '10px',
-                paddingTop: '4px',
-              }}
-            >
-              {format(msgProps.sentAt)}
-            </Typography>
           </StyledTypography>
         </div>
+        <Typography
+          variant='body2'
+          style={{
+            fontSize: '10px',
+            paddingBottom: '8px',
+          }}
+        >
+          {format(msgProps.sentAt)}
+        </Typography>
       </StyledDiv>
       <Menu
         id='msg-ctx-menu'

@@ -45,8 +45,10 @@
       "xss-clean": "^0.1.1"
    },
    "scripts": {
-      "start": "ts-node src/index.ts",
+      "start": "node dist/src/index.js",
+      "postinstall": "tsc",
       "dev": "nodemon --exec ts-node src/index.ts",
-      "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js"
+      "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+      "deploy": "git add . && git commit -m 'Deployment' && git push heroku master"
    }
 }

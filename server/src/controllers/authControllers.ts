@@ -173,7 +173,7 @@ export const refreshTokens = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.jid;
 
     if (!refreshToken) {
-      res.send({ ok: false, accessToken: '' });
+      return res.send({ ok: false, accessToken: '' });
     }
 
     let refreshPayload: any = null;
