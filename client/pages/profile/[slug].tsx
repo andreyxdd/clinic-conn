@@ -1,14 +1,18 @@
 import React from 'react';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
-import { Button, Typography } from '@mui/material';
+import {
+  Grid, Typography, Button,
+} from '@mui/material';
+import { format } from 'date-fns';
 import useLayout from '../../customHooks/useLayout';
 import useAuth from '../../customHooks/useAuth';
-// import VideoCallContainer from '../../components/VideoCallContainer';
-// import ChatContainer from '../../components/Chat/Chat';
 import ClientOnlyDiv from '../../components/ClientOnlyDiv';
-import { poster } from '../../lib/auth/csr';
+// import { poster } from '../../lib/auth/csr';
+// import { useRouter } from 'next/router';
 import env from '../../config/env';
+import useRedirect from '../../customHooks/useRedirect';
+import { IUser } from '../../config/types';
+import { fetcher } from '../../lib/auth/csr';
 
 export const getServerSideProps = async (context: { query: { slug: string | null; }; }) => {
   let { slug } = context.query;
@@ -25,69 +29,190 @@ interface IUserPageProps {
   slug: string | null;
 }
 
+interface IUserExtended extends IUser{
+  firstName: string | null;
+  lastName: string | null;
+  birthday: string | null;
+  [key: string]: string | null;
+}
+
 const UserPage: NextPage<IUserPageProps> = (props) => {
-  const router = useRouter();
-  // const { setChatId } = useSockets();
+  const { slug } = props;
+  useLayout({ showNavbar: true, showTransition: false, containerMaxWidth: 'xl' });
+  const isUser = useRedirect({ after: 5, where: '/home', whom: 'nonuser' });
+  // TODO: adjust above hook so useAuth is not needed
+  const { user } = useAuth();
+  const [profileData, setProfileData] = React.useState<IUserExtended>();
+  // const router = useRouter();
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  // const router = useRouter();
-  const [showContent, setShowContent] = React.useState(false);
-  const { slug } = props;
-  useLayout({ showNavbar: true, showTransition: false, containerMaxWidth: 'xl' });
-  const { user } = useAuth();
-
-  React.useEffect(() => {
-    // TODO: dont forget to correct below
-    if (user
-      && (user.username === 'volkov' || user.username === 'sample')) {
-      setShowContent(true);
-    }
-    setIsLoading(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
-
+  /*
   const handleStartChat = async () => {
     const res = await poster < { chatId: number }>(`${env.api}/chat/create`, { target: slug });
 
     if (res.data) {
-      // setChatId(res.data.chatId);
       router.push('/chat');
     }
-  };
+  }; */
+
+  React.useEffect(() => {
+    async function getUser() {
+      try {
+        const res = await fetcher<IUserExtended>(
+          `${env.api}/user/get/?username=${slug}`,
+        );
+        if (res.data) {
+          setProfileData(res.data);
+          setIsLoading(false);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    if (isUser) {
+      getUser();
+    }
+  }, [isUser, slug]);
 
   return (
-    <ClientOnlyDiv>
-      {isLoading ? <div>Loading ... </div> : (
-        <>
-          {showContent ? (
-            <div>
-              <Typography variant='h5'>
-                Hi,
-                {' '}
-                {user?.username}
-                . This is page of
-                {' '}
-                {slug}
-                {' '}
-                user.
-              </Typography>
-              <Button type='button' onClick={handleStartChat}>
-                Start Chat with
-                {' '}
-                {slug}
-              </Button>
-            </div>
-          )
-            : (
-              <div>
-                Sorry, this page is not availble to you.
-              </div>
-            )}
-        </>
-      )}
+    <>
+      {isUser
+        ? (
+          <ClientOnlyDiv>
+            {isLoading
+              ? <div>Loading ...</div>
+              : (
+                <Grid container spacing={2} direction='column'>
 
-    </ClientOnlyDiv>
+                  {/* Title */}
+                  <Grid item>
+                    <Typography variant='h5'>
+                      User Information
+                    </Typography>
+                  </Grid>
+
+                  {/* Prodile data */}
+                  {profileData
+                    ? (
+                      <Grid item container spacing={1} direction='column'>
+                        <Grid
+                          item
+                          container
+                          direction='row'
+                          spacing={1}
+                        >
+                          <Grid item>
+                            <Typography gutterBottom variant='body1' color='text.secondary'>
+                              Username:
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography gutterBottom variant='body1'>
+                              {profileData.username}
+                            </Typography>
+                          </Grid>
+                          <Grid
+                            item
+                            container
+                            direction='row'
+                            spacing={1}
+                          >
+                            <Grid item>
+                              <Typography gutterBottom variant='body1' color='text.secondary'>
+                                Id:
+                              </Typography>
+                            </Grid>
+                            <Grid item>
+                              <Typography gutterBottom variant='body1'>
+                                {profileData?.id}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                          {profileData.firstName && (
+                            <Grid
+                              item
+                              container
+                              direction='row'
+                              spacing={1}
+                            >
+                              <Grid item>
+                                <Typography gutterBottom variant='body1' color='text.secondary'>
+                                  First name:
+                                </Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography gutterBottom variant='body1'>
+                                  {profileData?.firstName}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          )}
+                          {profileData.lastName && (
+                            <Grid
+                              item
+                              container
+                              direction='row'
+                              spacing={1}
+                            >
+                              <Grid item>
+                                <Typography gutterBottom variant='body1' color='text.secondary'>
+                                  Last name:
+                                </Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography gutterBottom variant='body1'>
+                                  {profileData?.lastName}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          )}
+                          {profileData.birthday && (
+                            <Grid
+                              item
+                              container
+                              direction='row'
+                              spacing={1}
+                            >
+                              <Grid item>
+                                <Typography gutterBottom variant='body1' color='text.secondary'>
+                                  Birthday:
+                                </Typography>
+                              </Grid>
+                              <Grid item>
+                                <Typography gutterBottom variant='body1'>
+                                  {format(new Date(profileData.birthday), 'MMMM d, yyyy')}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          )}
+                        </Grid>
+                      </Grid>
+                    ) : (
+                      <Typography gutterBottom variant='body1' color='text.secondary'>
+                        Sorry profile data for the
+                        {' '}
+                        {slug}
+                        {' '}
+                        is not found
+                      </Typography>
+                    )}
+
+                  {/* Button */}
+                  <Grid item>
+                    <Button variant='contained' disabled={slug === user?.username}>
+                      Start Chat with
+                      {' '}
+                      {profileData?.username}
+                    </Button>
+                  </Grid>
+
+                </Grid>
+              )}
+          </ClientOnlyDiv>
+        ) : <div>Sorry, this page is not avaible to unauthorized users</div>}
+    </>
   );
 };
 

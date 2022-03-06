@@ -25,7 +25,7 @@ const useAuth = () => {
   // checking authorization and getting
   // user data if there is valid refresh token
   const fetchUser = React.useCallback(async () => {
-    const res = await fetcher<IUser>(`${env.api}/user/get`);
+    const res = await fetcher<IUser>(`${env.api}/user/me`);
     if (res.data) setUser(res.data);
     setUserHasMounted(true);
   }, []);
