@@ -7,12 +7,11 @@ import { format } from 'date-fns';
 import useLayout from '../../customHooks/useLayout';
 import useAuth from '../../customHooks/useAuth';
 import ClientOnlyDiv from '../../components/ClientOnlyDiv';
-// import { poster } from '../../lib/auth/csr';
-// import { useRouter } from 'next/router';
+import { fetcher } from '../../lib/auth/csr';
 import env from '../../config/env';
 import useRedirect from '../../customHooks/useRedirect';
 import { IUser } from '../../config/types';
-import { fetcher } from '../../lib/auth/csr';
+import StartChatModal from '../../components/Chat/StartChatModal';
 
 export const getServerSideProps = async (context: { query: { slug: string | null; }; }) => {
   let { slug } = context.query;
@@ -43,18 +42,10 @@ const UserPage: NextPage<IUserPageProps> = (props) => {
   // TODO: adjust above hook so useAuth is not needed
   const { user } = useAuth();
   const [profileData, setProfileData] = React.useState<IUserExtended>();
-  // const router = useRouter();
 
   const [isLoading, setIsLoading] = React.useState(true);
-
-  /*
-  const handleStartChat = async () => {
-    const res = await poster < { chatId: number }>(`${env.api}/chat/create`, { target: slug });
-
-    if (res.data) {
-      router.push('/chat');
-    }
-  }; */
+  const [openStartChatModal, setOpenStartChatModal] = React.useState(false);
+  const handleOpenStartChatModal = () => setOpenStartChatModal(true);
 
   React.useEffect(() => {
     async function getUser() {
@@ -200,16 +191,33 @@ const UserPage: NextPage<IUserPageProps> = (props) => {
                     )}
 
                   {/* Button */}
-                  <Grid item>
-                    <Button variant='contained' disabled={slug === user?.username}>
-                      Start Chat with
-                      {' '}
-                      {profileData?.username}
-                    </Button>
-                  </Grid>
+                  {profileData
+                    && (
+                      <>
+                        <Grid item>
+                          <Button
+                            variant='contained'
+                            disabled={slug === user!.username}
+                            type='button'
+                            onClick={handleOpenStartChatModal}
+                          >
+                            Chat with
+                            {' '}
+                            {profileData.username}
+                          </Button>
+                        </Grid>
+                        <StartChatModal
+                          initiatorUsername={user!.username}
+                          targetUsername={profileData.username}
+                          open={openStartChatModal}
+                          setOpen={setOpenStartChatModal}
+                        />
+                      </>
+                    )}
 
                 </Grid>
               )}
+
           </ClientOnlyDiv>
         ) : <div>Sorry, this page is not avaible to unauthorized users</div>}
     </>

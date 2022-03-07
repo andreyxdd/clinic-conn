@@ -106,6 +106,7 @@ export const register = async (req: Request, res: Response) => {
     });
 
     // TODO: correct typeorm issue (?)
+    // TODO: swtich to prisma (or similar) from TypeORM
     // creating verification token
     const emailToken = createConfirmationToken(lastUser.id + 1);
 

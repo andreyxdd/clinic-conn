@@ -34,7 +34,7 @@ export const createChat = async (req: Request, res: Response) => {
     const chatIdsOfInitiator = userChatsOfInitiator.map((uc: UserChat) => uc.chatId);
 
     const userChatsOfTarget = await UserChat.find({
-      where: { userId: 17 },
+      where: { userId: targetUser.id },
       select: ['chatId'],
     });
     const chatIdsOfTarget = userChatsOfTarget.map((uc: UserChat) => uc.chatId);
@@ -45,7 +45,9 @@ export const createChat = async (req: Request, res: Response) => {
       throw new Error('More than one shared chat!');
     }
 
-    if (commonChatId) {
+    // one instance of chat between the above users exists
+    // (as it should be only one)
+    if (commonChatId.length === 1) {
       return res.status(200).send({ chatId: commonChatId[0] });
     }
     // --

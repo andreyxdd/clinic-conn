@@ -1,3 +1,4 @@
+/*
 SELECT
   "tmp"."userId", "User"."username", "tmp"."chatId"
 FROM(
@@ -22,9 +23,7 @@ FROM "UserChat"
 LEFT JOIN "User" ON "User"."id"="UserChat"."userId"
 WHERE "UserChat"."userId" != 7 AND "UserChat"."chatId" = 2;
 
-/*WHERE "userId"=7;*/
 
-/*
 SELECT
   *
 FROM "UserChat";
@@ -34,3 +33,12 @@ SELECT
 FROM "Chat"
 INNER JOIN "UserChat" ON id=chatId;
 */
+
+DELETE FROM "UserChat"
+WHERE "UserChat"."chatId" = 4;
+
+DELETE FROM "Message"
+WHERE "Message"."chatId" = 4;
+
+DELETE FROM "Chat"
+WHERE id = 4;

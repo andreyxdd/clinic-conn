@@ -75,7 +75,7 @@ const LoginForm = () => {
         router.push('/home');
       } else {
         enqueueSnackbar(
-          'Something went wrong',
+          'Sorry, something went wrong. Please, report an issue.',
           { variant: 'error' },
         );
         setShowFormHelper(true);
