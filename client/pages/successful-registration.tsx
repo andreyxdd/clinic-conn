@@ -8,7 +8,7 @@ import ClientOnlyDiv from '../components/ClientOnlyDiv';
 
 const SuccessfulRegistration: NextPage = (): JSX.Element => {
   useLayout();
-  const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
+  const user = useRedirect({ after: 6, where: '/home', whom: 'user' });
 
   return (
     <ClientOnlyDiv>
@@ -19,7 +19,7 @@ const SuccessfulRegistration: NextPage = (): JSX.Element => {
         justifyContent='center'
         direction='column'
       >
-        {isUser ? (
+        {user ? (
           <Grid item>
             <Typography variant='h4' align='center'>
               Sorry, this page is not availble to you. In a few secs you will be redirected to the Home page

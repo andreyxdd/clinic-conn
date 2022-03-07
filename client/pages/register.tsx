@@ -13,12 +13,12 @@ const RegisterForm = dynamic(
 interface IRegisterProps {}
 
 const Register: React.FC<IRegisterProps> = () => {
-  const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
+  const user = useRedirect({ after: 6, where: '/home', whom: 'user' });
   useLayout({ showNavbar: false, showTransition: false, containerMaxWidth: 'xs' });
 
   return (
     <ClientOnlyDiv>
-      {!isUser ? (
+      {!user ? (
         <RegisterForm />
       ) : (
         <Typography

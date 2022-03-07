@@ -48,7 +48,7 @@ const useUserRedirect = (
     return () => { isMounted = false; };
   }, []);
 
-  return !!user;
+  return user;
 };
 
 export default useUserRedirect;

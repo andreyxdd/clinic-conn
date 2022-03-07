@@ -11,11 +11,11 @@ import ClientOnlyDiv from '../components/ClientOnlyDiv';
 
 const UnsuccessfulConfirmation: NextPage = (): JSX.Element => {
   useLayout();
-  const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
+  const user = useRedirect({ after: 6, where: '/home', whom: 'user' });
 
   return (
     <ClientOnlyDiv>
-      {isUser ? (
+      {user ? (
         <Typography variant='h4' align='center'>
           Sorry, this page is not availble to you. In a few secs you will be redirected to the Home page
         </Typography>

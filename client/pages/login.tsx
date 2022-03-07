@@ -15,12 +15,12 @@ const LoginForm = dynamic(
 interface ILoginPageProps {}
 
 const Login: NextPage<ILoginPageProps> = () => {
-  const isUser = useRedirect({ after: 6, where: '/home', whom: 'user' });
+  const user = useRedirect({ after: 6, where: '/home', whom: 'user' });
   useLayout({ showNavbar: false, showTransition: false, containerMaxWidth: 'xs' });
 
   return (
     <ClientOnlyDiv>
-      {!isUser ? (
+      {!user ? (
         <LoginForm />
       ) : (
         <Typography
