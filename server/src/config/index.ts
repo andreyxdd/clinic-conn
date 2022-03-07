@@ -19,13 +19,15 @@ export const corsSocketOptions = {
   methods: ['GET', 'POST'],
 };
 
-export const isProduction = process.env.NODE_ENV === 'production';
+// export const isProduction = process.env.NODE_ENV === 'production';
 
 export const cookiesOptions: CookieOptions = {
   httpOnly: true,
-  secure: isProduction,
-  sameSite: (isProduction ? 'strict' : 'lax'),
-  domain: process.env.BASE_DOMAIN,
+  // secure: isProduction,
+  secure: true,
+  // sameSite: (isProduction ? 'strict' : 'lax'),
+  sameSite: 'none',
+  // domain: process.env.BASE_DOMAIN,
   path: '/',
 };
 

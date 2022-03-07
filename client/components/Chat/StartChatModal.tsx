@@ -92,13 +92,14 @@ const StartChatModal = ({
           readAt: null,
         };
 
-        socket!.emit(events.CLIENT.SEND_MESSAGE, {
-          content,
-          chatId: res.data.chatId,
-        });
-
         // chat already exists
         if (chats.map((c: IChat) => c.chatId).includes(res.data.chatId)) {
+          // emitting message to the existing chat
+          socket!.emit(events.CLIENT.SEND_MESSAGE, {
+            content,
+            chatId: res.data.chatId,
+          });
+
           // updating chats array to indicate active chat
           // and adding a new message
           setChats((currChats: Array<IChat>) => {
@@ -115,15 +116,28 @@ const StartChatModal = ({
             return updatedChats;
           });
         } else { // new chat
+          // common newChat object
+          const newChat = {
+            chatId: res.data!.chatId,
+            messages: [content],
+          };
+
+          // emitting message to the new chat
+          socket!.emit(events.CLIENT.SEND_MESSAGE, {
+            content,
+            chatId: res.data.chatId,
+            newChat: { ...newChat, participantUsername: initiatorUsername },
+            targetUsername,
+          });
+
           setChats((currChats: Array<IChat>) => {
             const updatedChats = currChats.map((chat: IChat) => (
               { ...chat, active: false }
             ));
             return [...updatedChats, {
-              chatId: res.data!.chatId,
-              messages: [content],
-              participantUsername: targetUsername,
+              ...newChat,
               active: true,
+              participantUsername: targetUsername,
             }];
           });
         }

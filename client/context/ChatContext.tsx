@@ -93,6 +93,14 @@ const ChatProvider = ({ children }: IChatProvider) => {
       setChats(userChats);
     });
 
+    // another user initiates new chat
+    socket.on(events.SERVER.NEW_CHAT, (newChat: IChat) => {
+      setChats((currChats: Array<IChat>) => ([
+        ...currChats,
+        { ...newChat, active: false },
+      ]));
+    });
+
     // getting new messages
     socket.on(events.SERVER.CHAT_MESSAGE, (content: IMessage, fromChatId: number) => {
       setChats((currChats) => {
@@ -100,6 +108,7 @@ const ChatProvider = ({ children }: IChatProvider) => {
           if (chat.chatId === fromChatId) {
             return { ...chat, messages: [...chat.messages, content] };
           }
+
           return { ...chat };
         });
         return updatedChats;

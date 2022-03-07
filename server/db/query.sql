@@ -35,10 +35,10 @@ INNER JOIN "UserChat" ON id=chatId;
 */
 
 DELETE FROM "UserChat"
-WHERE "UserChat"."chatId" = 4;
+WHERE "UserChat"."chatId" = 12;
 
 DELETE FROM "Message"
-WHERE "Message"."chatId" = 4;
+WHERE "Message"."chatId" = 12;
 
 DELETE FROM "Chat"
-WHERE id = 4;
+WHERE id = 12;

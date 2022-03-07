@@ -114,6 +114,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
   const handleSendMessages = () => {
     if (newMessageRef.current !== null && activeChat) {
       const msgText = newMessageRef.current.value;
+      console.log(msgText);
 
       // can't send white space
       if (!String(msgText).trim()) return;
@@ -144,6 +145,21 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
       });
 
       newMessageRef.current.value = '';
+    }
+  };
+
+  const handleKeypress = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.charCode === 13) {
+      // TODO: work on line break behavoir and multi line message display
+      if (e.ctrlKey) {
+        if (newMessageRef.current) {
+          newMessageRef.current.value += '\r\n';
+          newMessageRef.current.focus();
+        }
+      } else {
+        e.preventDefault();
+        handleSendMessages();
+      }
     }
   };
 
@@ -314,6 +330,7 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
               placeholder='Write message...'
               fullWidth
               multiline
+              onKeyPress={handleKeypress}
               style={{
                 backgroundColor: 'white',
               }}
@@ -327,7 +344,11 @@ const MessagesContainer: React.FC<IMessagesContainer> = ({ xs }) => {
             justifyContent='center'
             alignItems='center'
           >
-            <IconButton onClick={handleSendMessages} aria-label='send-icon-btn' size='large'>
+            <IconButton
+              onClick={handleSendMessages}
+              aria-label='send-icon-btn'
+              size='large'
+            >
               <SendIcon />
             </IconButton>
           </Grid>

@@ -49,6 +49,9 @@ const Hospitals: NextPage = (): JSX.Element => {
           </Grid>
         </Grid>
       </div>
+      <Typography variant='h5' sx={{ mt: 5, ml: 5 }}>
+        Users profiles:
+      </Typography>
     </>
   );
 };

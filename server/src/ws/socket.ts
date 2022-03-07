@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import Message from '../entities/Message';
-import { IMessage } from '../config/types';
+import { IMessage, IChat } from '../config/types';
 import { getUserChatsViaSockets } from '../controllers/chatControllers';
 import logger from '../utils/log';
 
@@ -23,6 +23,7 @@ const EVENTS = {
     CHAT_MESSAGE: 'CHAT_MESSAGE',
     USER_CHATS: 'USER_CHATS',
     READ_MESSAGE: 'READ_MESSAGE',
+    NEW_CHAT: 'NEW_CHAT',
   },
 };
 
@@ -64,7 +65,15 @@ function setSocket({ io }: { io: Server }) {
 
     // handling message sent from the client
     socket.on(EVENTS.CLIENT.SEND_MESSAGE, async (
-      { content, chatId }: {content: IMessage, chatId: number},
+      {
+        content, chatId, newChat, targetUsername,
+      }:
+        {
+          content: IMessage,
+          chatId: number,
+          newChat: IChat | undefined,
+          targetUsername: string | undefined
+        },
     ) => {
       const { sentAt, text } = content;
       await Message.insert({
@@ -74,8 +83,21 @@ function setSocket({ io }: { io: Server }) {
         sentAt,
       });
 
-      // 'to' is a room id (eg 'chatId-1')
-      socket.to(`chat-${chatId}`).emit(EVENTS.SERVER.CHAT_MESSAGE, content, chatId);
+      if (newChat) {
+        // determining if the target user online
+        // it means that the corresponding socket is in array
+        // of all sockets
+        const allSockets = await io.fetchSockets();
+        const targetScoket = allSockets.find(
+          (s: any) => s.data.username === targetUsername,
+        );
+        if (targetScoket) {
+          targetScoket.join(`chat-${chatId}`);
+          targetScoket.emit(EVENTS.SERVER.NEW_CHAT, newChat);
+        }
+      } else {
+        socket.to(`chat-${chatId}`).emit(EVENTS.SERVER.CHAT_MESSAGE, content, chatId);
+      }
     });
 
     // reading last unread message
