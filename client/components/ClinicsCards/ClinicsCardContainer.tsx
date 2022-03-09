@@ -6,7 +6,7 @@ import ClinicCard, { IClinicCard } from './ClinicCard';
 interface IClinicsCardContainer {}
 
 const ClinicsCardContainer: React.FC<IClinicsCardContainer> = () => (
-  <Box sx={{ flexGrow: 1 }}>
+  <Box sx={{ flexGrow: 1, pt: 5 }}>
     <Grid
       container
       spacing={2}

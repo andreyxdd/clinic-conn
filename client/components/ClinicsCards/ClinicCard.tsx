@@ -43,6 +43,7 @@ const ClinicCard: React.FC<IClinicCard> = ({
         {description}
       </Typography>
     </CardContent>
+    <div style={{ flexGrow: 1 }} />
     <CardActions>
       <Link href={`/clinic/${title}`} passHref>
         <Button fullWidth>See more</Button>
