@@ -27,7 +27,7 @@ const Home: NextPage<IHomePageProps> = (): JSX.Element => {
       <Typography variant='body2' component='p' sx={{ m: 5 }}>
         Donec porta finibus convallis. Nam elementum eros quis ante vehicula, at aliquam eros malesuada. Morbi cursus dui ut erat sagittis, id sodales elit luctus. Cras sagittis dolor nec dui imperdiet, quis suscipit enim bibendum. Phasellus vehicula malesuada rhoncus. Vivamus ac diam et diam consequat interdum ut nec erat. Vestibulum in tempor nisl. Praesent id imperdiet odio. Proin non viverra quam, non hendrerit elit. Nulla imperdiet mi dolor. Fusce dignissim, arcu vitae blandit iaculis, magna tortor sodales mi, laoreet cursus est odio vel sapien. Fusce pulvinar efficitur faucibus. Maecenas egestas sollicitudin arcu ut iaculis. Nunc ullamcorper dapibus lacus, eu sodales eros mattis eu.
       </Typography>
-      <Typography variant='h5'>
+      <Typography variant='h5' sx={{ m: 5 }}>
         Top 8 Clinics
       </Typography>
       <ClinicsCardContainer />

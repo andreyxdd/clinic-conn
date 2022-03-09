@@ -85,6 +85,9 @@ export const register = async (req: Request, res: Response) => {
       birthday,
     } = req.body;
 
+    //-----
+    // unable to fix typeorm bug for incrementing primary index
+    // TODO: swtich to prisma (or similar)
     const users = await User.find(
       { order: { id: 'DESC' } },
     );
@@ -104,9 +107,8 @@ export const register = async (req: Request, res: Response) => {
       lastName,
       birthday,
     });
+    //-----
 
-    // TODO: correct typeorm issue (?)
-    // TODO: swtich to prisma (or similar) from TypeORM
     // creating verification token
     const emailToken = createConfirmationToken(lastUser.id + 1);
 
